@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A9264DB62A90FB24007D1C80 /* RemoteFeedLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9264DB52A90FB24007D1C80 /* RemoteFeedLoader.swift */; };
 		A96CF5382A90C008004E2640 /* FeedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96CF5372A90C008004E2640 /* FeedItem.swift */; };
 		A96CF53A2A90C086004E2640 /* FeedLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96CF5392A90C086004E2640 /* FeedLoader.swift */; };
 		A9BF404B2A90C53000FFA1DE /* RemoteFeedLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9BF404A2A90C53000FFA1DE /* RemoteFeedLoaderTests.swift */; };
@@ -24,6 +25,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A9264DB52A90FB24007D1C80 /* RemoteFeedLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteFeedLoader.swift; sourceTree = "<group>"; };
 		A96CF52C2A90BF6E004E2640 /* EssentialFeed.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EssentialFeed.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A96CF5372A90C008004E2640 /* FeedItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedItem.swift; sourceTree = "<group>"; };
 		A96CF5392A90C086004E2640 /* FeedLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedLoader.swift; sourceTree = "<group>"; };
@@ -51,6 +53,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A9264DB42A90FAFF007D1C80 /* FeedAPI */ = {
+			isa = PBXGroup;
+			children = (
+				A9264DB52A90FB24007D1C80 /* RemoteFeedLoader.swift */,
+			);
+			path = FeedAPI;
+			sourceTree = "<group>";
+		};
 		A96CF5222A90BF6E004E2640 = {
 			isa = PBXGroup;
 			children = (
@@ -73,6 +83,7 @@
 		A96CF52E2A90BF6E004E2640 /* EssentialFeed */ = {
 			isa = PBXGroup;
 			children = (
+				A9264DB42A90FAFF007D1C80 /* FeedAPI */,
 				A96CF5362A90BFF5004E2640 /* FeedFeature */,
 			);
 			path = EssentialFeed;
@@ -205,6 +216,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A96CF53A2A90C086004E2640 /* FeedLoader.swift in Sources */,
+				A9264DB62A90FB24007D1C80 /* RemoteFeedLoader.swift in Sources */,
 				A96CF5382A90C008004E2640 /* FeedItem.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
