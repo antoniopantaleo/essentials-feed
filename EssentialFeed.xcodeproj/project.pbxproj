@@ -6,8 +6,13 @@
 	objectVersion = 56;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A96CF5382A90C008004E2640 /* FeedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96CF5372A90C008004E2640 /* FeedItem.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		A96CF52C2A90BF6E004E2640 /* EssentialFeed.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EssentialFeed.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A96CF5372A90C008004E2640 /* FeedItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -40,8 +45,17 @@
 		A96CF52E2A90BF6E004E2640 /* EssentialFeed */ = {
 			isa = PBXGroup;
 			children = (
+				A96CF5362A90BFF5004E2640 /* FeedFeature */,
 			);
 			path = EssentialFeed;
+			sourceTree = "<group>";
+		};
+		A96CF5362A90BFF5004E2640 /* FeedFeature */ = {
+			isa = PBXGroup;
+			children = (
+				A96CF5372A90C008004E2640 /* FeedItem.swift */,
+			);
+			path = FeedFeature;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -86,6 +100,7 @@
 				TargetAttributes = {
 					A96CF52B2A90BF6E004E2640 = {
 						CreatedOnToolsVersion = 14.3.1;
+						LastSwiftMigration = 1430;
 					};
 				};
 			};
@@ -122,6 +137,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A96CF5382A90C008004E2640 /* FeedItem.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -250,6 +266,7 @@
 		A96CF5342A90BF6E004E2640 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -274,6 +291,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -281,6 +299,7 @@
 		A96CF5352A90BF6E004E2640 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
