@@ -43,7 +43,8 @@ public final class RemoteFeedLoader {
                     response.statusCode == 200,
                     let root = try? JSONDecoder().decode(Root.self, from: data)
                 {
-                    completion(.success(root.items))
+                    let feedItems = root.items.map { $0.asFeedItem }
+                    completion(.success(feedItems))
                 } else {
                     completion(.failure(.invalidData))
                 }
@@ -54,6 +55,24 @@ public final class RemoteFeedLoader {
     }
 }
 
-private struct Root: Decodable {
-    let items: [FeedItem]
+fileprivate struct Root: Decodable {
+    let items: [Item]
+}
+
+
+/// This is a FeedItem representation only used by the API module
+fileprivate struct Item: Decodable {
+    private let id: UUID
+    private let description: String?
+    private let location: String?
+    private let image: URL
+
+    var asFeedItem: FeedItem {
+        FeedItem(
+            id: id,
+            description: description,
+            location: location,
+            imageURL: image
+        )
+    }
 }
