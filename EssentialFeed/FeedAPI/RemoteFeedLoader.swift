@@ -39,13 +39,10 @@ public final class RemoteFeedLoader {
     public func load(completion: @escaping (Result) -> Void) {
         client.get(from: url) { result in
             if case .success(let data, let response) = result {
-                if
-                    response.statusCode == 200,
-                    let root = try? JSONDecoder().decode(Root.self, from: data)
-                {
-                    let feedItems = root.items.map { $0.asFeedItem }
-                    completion(.success(feedItems))
-                } else {
+                do {
+                    let items = try FeedItemsMapper.map(data, response)
+                    completion(.success(items))
+                } catch {
                     completion(.failure(.invalidData))
                 }
             } else {
@@ -55,24 +52,37 @@ public final class RemoteFeedLoader {
     }
 }
 
-fileprivate struct Root: Decodable {
-    let items: [Item]
-}
+fileprivate class FeedItemsMapper {
+    private static let decoder = JSONDecoder()
+    
+    struct Root: Decodable {
+        let items: [Item]
+    }
 
+    /// This is a FeedItem representation only used by the API module
+    struct Item: Decodable {
+        private let id: UUID
+        private let description: String?
+        private let location: String?
+        private let image: URL
 
-/// This is a FeedItem representation only used by the API module
-fileprivate struct Item: Decodable {
-    private let id: UUID
-    private let description: String?
-    private let location: String?
-    private let image: URL
-
-    var asFeedItem: FeedItem {
-        FeedItem(
-            id: id,
-            description: description,
-            location: location,
-            imageURL: image
-        )
+        var asFeedItem: FeedItem {
+            FeedItem(
+                id: id,
+                description: description,
+                location: location,
+                imageURL: image
+            )
+        }
+    }
+    
+    static func map(_ data: Data, _ response: HTTPURLResponse) throws -> [FeedItem] {
+        guard response.statusCode == 200 else {
+            throw RemoteFeedLoader.Error.invalidData
+        }
+        return try decoder
+            .decode(Root.self, from: data)
+            .items
+            .map { $0.asFeedItem }
     }
 }
