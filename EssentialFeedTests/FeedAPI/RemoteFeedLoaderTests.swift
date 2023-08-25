@@ -31,7 +31,7 @@ final class RemoteFeedLoaderTests: XCTestCase {
         
         expect(
             sut,
-            toCompleteWithResult: .failure(RemoteFeedLoader.Error.connectivity),
+            toCompleteWithResult: failure(.connectivity),
             when: {
                 let clientError = NSError(domain: "Test", code: 0)
                 client.complete(with: clientError)
@@ -49,7 +49,7 @@ final class RemoteFeedLoaderTests: XCTestCase {
             .forEach { index, code in
                 expect(
                     sut,
-                    toCompleteWithResult: .failure(RemoteFeedLoader.Error.invalidData),
+                    toCompleteWithResult: failure(.invalidData),
                     when: {
                         let json = makeItemsJSON([])
                         client.complete(
@@ -77,7 +77,7 @@ final class RemoteFeedLoaderTests: XCTestCase {
         
         expect(
             sut,
-            toCompleteWithResult: .failure(RemoteFeedLoader.Error.invalidData),
+            toCompleteWithResult: failure(.invalidData),
             when: {
                 let invalidJson = Data("invalid data".utf8)
                 client.complete(withStatusCode: 200, data: invalidJson)
@@ -190,6 +190,10 @@ final class RemoteFeedLoaderTests: XCTestCase {
         ].compactMapValues { $0 }
         
         return (model, json)
+    }
+    
+    private func failure(_ error: RemoteFeedLoader.Error) -> RemoteFeedLoader.Result {
+        .failure(error)
     }
     
     private func makeItemsJSON(_ items: [[String:Any]]) -> Data {
