@@ -17,7 +17,7 @@ public final class RemoteFeedLoader: FeedLoader {
     }
     
     /// We are specyfing the error type here
-    public typealias Result = LoadFeedResult<Error>
+    public typealias Result = LoadFeedResult
     
     public init(url: URL, client: HTTPClient) {
         self.client = client
@@ -33,7 +33,7 @@ public final class RemoteFeedLoader: FeedLoader {
                 let result = FeedItemsMapper.map(data, from: response)
                 completion(result)
             } else {
-                completion(.failure(.connectivity))
+                completion(.failure(Error.connectivity))
             }
         }
     }
