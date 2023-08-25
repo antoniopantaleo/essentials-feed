@@ -27,7 +27,10 @@ public final class RemoteFeedLoader {
     }
     
     public func load(completion: @escaping (Result) -> Void) {
-        client.get(from: url) { result in
+        client.get(from: url) { [weak self] result in
+            /// We use this guard here to prevent OS to execute the static method
+            /// if the RemoteFeedLoader instance has been deleted
+            guard self != nil else { return }
             if case .success(let data, let response) = result {
                 let result = FeedItemsMapper.map(data, from: response)
                 completion(result)
