@@ -7,11 +7,21 @@
 
 import Foundation
 
-enum LoadFeedResult {
+/// We need to make this enum equatable since we use arrays in test
+/// But Error is a protocol and it could be not equatable
+/// We use a generic constranits
+/// ensuring that the tests will use the equatable version using the extension below
+public enum LoadFeedResult<Error: Swift.Error> {
     case success([FeedItem])
-    case error(Error)
+    case failure(Error)
 }
 
+/// It means: if the error is equatable, then the enum is equatable
+extension LoadFeedResult: Equatable where Error: Equatable { }
+
+/// We need to handle the generic constraint here too
+/// It has to be generic, so we use an assciated type
 protocol FeedLoader {
-    func loadFeed(completion: @escaping (LoadFeedResult) -> Void)
+    associatedtype Error: Swift.Error
+    func load(completion: @escaping (LoadFeedResult<Error>) -> Void)
 }
