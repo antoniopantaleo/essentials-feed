@@ -16,9 +16,6 @@ public enum LoadFeedResult<Error: Swift.Error> {
     case failure(Error)
 }
 
-/// It means: if the error is equatable, then the enum is equatable
-extension LoadFeedResult: Equatable where Error: Equatable { }
-
 /// We need to handle the generic constraint here too
 /// It has to be generic, so we use an assciated type
 protocol FeedLoader {
