@@ -12,7 +12,8 @@ final class FeedItemsMapper {
     private static let OK_200 = 200
     
     private struct Root: Decodable {
-        let items: [Item]
+        private let items: [Item]
+        var feeds: [FeedItem] { items.map { $0.asFeedItem } }
     }
 
     /// This is a FeedItem representation only used by the API module
@@ -32,13 +33,14 @@ final class FeedItemsMapper {
         }
     }
     
-    static func map(_ data: Data, _ response: HTTPURLResponse) throws -> [FeedItem] {
-        guard response.statusCode == OK_200 else {
-            throw RemoteFeedLoader.Error.invalidData
-        }
-        return try decoder
-            .decode(Root.self, from: data)
-            .items
-            .map { $0.asFeedItem }
+    /// A way to avoid to weak-ify self and avoid reatin cycles is to use static func
+    static func map(_ data: Data, from response: HTTPURLResponse) -> RemoteFeedLoader.Result {
+        guard
+            response.statusCode == OK_200,
+            let root = try? decoder.decode(Root.self, from: data)
+        else { return .failure(.invalidData) }
+        
+        let items = root.feeds
+        return .success(items)
     }
 }
