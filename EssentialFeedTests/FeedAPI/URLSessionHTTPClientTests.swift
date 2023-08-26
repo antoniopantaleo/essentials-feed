@@ -26,20 +26,37 @@ class URLSessionHTTPClient {
 
 final class URLSessionHTTPClientTests: XCTestCase {
     
-    func test_getFromURL_failsOnRequestError() {
+    override class func setUp() {
         URLProtocolStub.startInterceptingRequests()
+    }
+    
+    override class func tearDown() {
+        URLProtocolStub.stopInterceptingRequests()
+    }
+    
+    func test_getFromURL_performsGETRequestWithURL() {
+        let url = URL(string: "https://any-url.com")!
+        let expectation = expectation(description: "Waiting for request")
+        URLProtocolStub.observeRequest { request in
+            XCTAssertEqual(request.url, url)
+            XCTAssertEqual(request.httpMethod, "GET")
+            expectation.fulfill()
+        }
+        let client = URLSessionHTTPClient()
+        client.get(from: url) { _ in }
+        
+        wait(for: [expectation], timeout: 1.0)
+    }
+    
+    func test_getFromURL_failsOnRequestError() {
         let url = URL(string: "http://any-url.com")!
         let error = NSError(domain: "any error", code: 0)
-        URLProtocolStub.stub(
-            data: nil,
-            response: nil,
-            error: error
-        )
+        URLProtocolStub.stub(data: nil, response: nil, error: error)
         
         let sut = URLSessionHTTPClient()
         
         let expecation = expectation(description: "Wait for completion")
-        sut.get(from: url) { result in
+        sut.get(from: url) { result in
             if case .failure(let receivedError as NSError) = result {
                 XCTAssertEqual(receivedError.domain, error.domain)
                 XCTAssertEqual(receivedError.code, error.code)
@@ -49,13 +66,14 @@ final class URLSessionHTTPClientTests: XCTestCase {
             expecation.fulfill()
         }
         wait(for: [expecation], timeout: 1.0)
-        URLProtocolStub.stopInterceptingRequests()
     }
     
     // MARK: Helpers
     
     private class URLProtocolStub: URLProtocol {
         private static var stub: Stub?
+        private static var requestObserver: ((URLRequest) -> Void)?
+        
         /// This struct maps the closure we get from our HTTPClient.get method
         private struct Stub {
             let data: Data?
@@ -74,10 +92,16 @@ final class URLSessionHTTPClientTests: XCTestCase {
         static func stopInterceptingRequests() {
             URLProtocol.unregisterClass(URLProtocolStub.self)
             stub = nil
+            requestObserver = nil
+        }
+        
+        static func observeRequest(observer: @escaping (URLRequest) -> Void) {
+            requestObserver = observer
         }
         
         /// We intercept all requests
         override class func canInit(with request: URLRequest) -> Bool {
+            requestObserver?(request)
             return true
         }
         
