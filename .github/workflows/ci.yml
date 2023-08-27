@@ -1,0 +1,21 @@
+name: "CI"
+
+on:
+  pull_request:
+    branches: ["develop"]
+
+jobs:
+  build-and-test:
+    name: Build and run tests
+    runs-on: macos-13
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v3
+      - name: Select Xcode version
+        run: sudo xcode-select -switch /Applications/Xcode.app
+      - name: Clean
+        run: xcodebuild clean -project EssentialFeed.xcodeproj -scheme "CI" CODE_SIGNING_REQUIRED=NO
+      - name: Build
+        run: xcodebuild build -project EssentialFeed.xcodeproj -scheme "CI" CODE_SIGNING_REQUIRED=NO
+      - name: Test
+        run: xcodebuild test -project EssentialFeed.xcodeproj -scheme "CI" CODE_SIGNING_REQUIRED=NO
