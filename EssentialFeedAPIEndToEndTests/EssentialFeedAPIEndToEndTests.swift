@@ -31,10 +31,13 @@ final class EssentialFeedAPIEndToEndTests: XCTestCase {
     
     // MARK: Helpers
     
-    private func getFeedResult() -> LoadFeedResult? {
+    private func getFeedResult(file: StaticString = #filePath, line: UInt = #line) -> LoadFeedResult? {
         let testServerURL = URL(string: "https://essentialdeveloper.com/feed-case-study/test-api/feed")!
         let client = URLSessionHTTPClient()
         let loader = RemoteFeedLoader(url: testServerURL, client: client)
+        
+        trackMemoryLeaks(client, file: file, line: line)
+        trackMemoryLeaks(loader, file: file, line: line)
         
         let expectation = expectation(description: "Wait for completion")
         var returnedResult: LoadFeedResult?
