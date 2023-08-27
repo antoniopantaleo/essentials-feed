@@ -11,34 +11,40 @@ import EssentialFeed
 final class EssentialFeedAPIEndToEndTests: XCTestCase {
 
     func test_endToEndTestServerGETFeedResult_matchesFixedTestAccountData() {
+        let result = getFeedResult()
+        if case .success(let items) = result {
+            XCTAssertEqual(items.count, 8, "Expected 8 items in the test service")
+            XCTAssertEqual(items[0], self.expectedItem(at: 0))
+            XCTAssertEqual(items[1], self.expectedItem(at: 1))
+            XCTAssertEqual(items[2], self.expectedItem(at: 2))
+            XCTAssertEqual(items[3], self.expectedItem(at: 3))
+            XCTAssertEqual(items[4], self.expectedItem(at: 4))
+            XCTAssertEqual(items[5], self.expectedItem(at: 5))
+            XCTAssertEqual(items[6], self.expectedItem(at: 6))
+            XCTAssertEqual(items[7], self.expectedItem(at: 7))
+            
+        } else {
+            XCTFail("Expected success, got \(String(describing: result)) instead")
+        }
+        
+    }
+    
+    // MARK: Helpers
+    
+    private func getFeedResult() -> LoadFeedResult? {
         let testServerURL = URL(string: "https://essentialdeveloper.com/feed-case-study/test-api/feed")!
         let client = URLSessionHTTPClient()
         let loader = RemoteFeedLoader(url: testServerURL, client: client)
         
         let expectation = expectation(description: "Wait for completion")
-        loader.load { [weak self] result in
-            guard let self = self else { return }
-            if case .success(let items) = result {
-                XCTAssertEqual(items.count, 8, "Expected 8 items in the test service")
-                XCTAssertEqual(items[0], self.expectedItem(at: 0))
-                XCTAssertEqual(items[1], self.expectedItem(at: 1))
-                XCTAssertEqual(items[2], self.expectedItem(at: 2))
-                XCTAssertEqual(items[3], self.expectedItem(at: 3))
-                XCTAssertEqual(items[4], self.expectedItem(at: 4))
-                XCTAssertEqual(items[5], self.expectedItem(at: 5))
-                XCTAssertEqual(items[6], self.expectedItem(at: 6))
-                XCTAssertEqual(items[7], self.expectedItem(at: 7))
-                
-            } else {
-                XCTFail("Expected success, got \(result) instead")
-            }
+        var returnedResult: LoadFeedResult?
+        loader.load { result in
+            returnedResult = result
             expectation.fulfill()
         }
-        
         wait(for: [expectation], timeout: 5.0)
+        return returnedResult
     }
-    
-    // MARK: Helpers
     
     private func expectedItem(at index: Int) -> FeedItem {
         FeedItem(
