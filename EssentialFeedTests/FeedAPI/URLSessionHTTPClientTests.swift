@@ -21,13 +21,18 @@ final class URLSessionHTTPClientTests: XCTestCase {
     func test_getFromURL_performsGETRequestWithURL() {
         let url = anyURL
         let expectation = expectation(description: "Waiting for request")
+        /// We are asserting that we need two fullfill
+        expectation.expectedFulfillmentCount = 2
+        
         URLProtocolStub.observeRequest { request in
             XCTAssertEqual(request.url, url)
             XCTAssertEqual(request.httpMethod, "GET")
             expectation.fulfill()
         }
         let sut = makeSUT()
-        sut.get(from: url) { _ in }
+        sut.get(from: url) { _ in
+            expectation.fulfill()
+        }
         
         wait(for: [expectation], timeout: 1.0)
     }
