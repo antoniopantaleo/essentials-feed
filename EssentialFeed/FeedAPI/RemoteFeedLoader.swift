@@ -29,10 +29,11 @@ public final class RemoteFeedLoader: FeedLoader {
             /// We use this guard here to prevent OS to execute the static method
             /// if the RemoteFeedLoader instance has been deleted
             guard self != nil else { return }
-            if case .success(let data, let response) = result {
+            switch result {
+            case let .success(data, response):
                 let result = FeedItemsMapper.map(data, from: response)
                 completion(result)
-            } else {
+            case .failure(_):
                 completion(.failure(Error.connectivity))
             }
         }
