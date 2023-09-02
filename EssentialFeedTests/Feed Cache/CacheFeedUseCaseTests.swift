@@ -17,8 +17,9 @@ class LocalFeedLoader {
         self.currentDate = currentDate
     }
     
-    func save(_ items: [FeedItem]) {
+    func save(_ items: [FeedItem], completion: @escaping (Error?) -> Void) {
         store.deleteChachedFeeds { [unowned self] error in
+            completion(error)
             if error == nil {
                 store.insert(items, timestamp: self.currentDate())
             }
@@ -69,7 +70,7 @@ final class CacheFeedUseCaseTests: XCTestCase {
         let (sut, store) = makeSUT()
         let items = [uniqueItem(), uniqueItem()]
         // When
-        sut.save(items)
+        sut.save(items) { _ in }
         // Then
         XCTAssertEqual(store.receivedMessages, [.deleteCacheFeed])
     }
@@ -80,10 +81,28 @@ final class CacheFeedUseCaseTests: XCTestCase {
         let items = [uniqueItem(), uniqueItem()]
         let deletionError = anyError
         // When
-        sut.save(items)
+        sut.save(items) { _ in }
         store.completeDeletion(with: deletionError)
         // Then
         XCTAssertEqual(store.receivedMessages, [.deleteCacheFeed])
+    }
+    
+    func test_save_failsOnDeletionError() {
+        // Given
+        let (sut, store) = makeSUT()
+        let items = [uniqueItem(), uniqueItem()]
+        let deletionError = anyError
+        let expectation = expectation(description: "Wait for save completion")
+        var receivedError: Error?
+        // When
+        sut.save(items) { error in
+            receivedError = error
+            expectation.fulfill()
+        }
+        store.completeDeletion(with: deletionError)
+        wait(for: [expectation], timeout: 1.0)
+        // Then
+        XCTAssertEqual(receivedError as? NSError, deletionError)
     }
     
     func test_save_requestNewCacheInsertionWithTimestampOnSuccesfulDeletion() {
@@ -92,7 +111,7 @@ final class CacheFeedUseCaseTests: XCTestCase {
         let (sut, store) = makeSUT(currentDate: { timestamp })
         let items = [uniqueItem(), uniqueItem()]
         // When
-        sut.save(items)
+        sut.save(items) { _ in }
         store.completeDeletionSuccessfully()
         // Then
         XCTAssertEqual(
