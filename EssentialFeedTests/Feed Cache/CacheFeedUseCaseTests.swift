@@ -23,9 +23,14 @@ class LocalFeedLoader {
 /// This class help us to abstract the framework we are going to use from the tests
 class FeedStore {
     private(set) var deleteCacheFeedCallCount: Int = 0
+    private(set) var insertCallCount = 0
     
     func deleteChachedFeeds() {
         deleteCacheFeedCallCount += 1
+    }
+    
+    func completeDeletion(with error: Error, at index: Int = 0) {
+        
     }
     
 }
@@ -46,6 +51,18 @@ final class CacheFeedUseCaseTests: XCTestCase {
         XCTAssertEqual(store.deleteCacheFeedCallCount, 1)
     }
     
+    func test_save_doesNotRequestCacheInsertionOnDeletionError() {
+        // Given
+        let (sut, store) = makeSUT()
+        let items = [uniqueItem(), uniqueItem()]
+        let deletionError = anyError
+        // When
+        sut.save(items)
+        store.completeDeletion(with: deletionError)
+        // Then
+        XCTAssertEqual(store.insertCallCount, 0)
+    }
+    
     // MARK: Helpers
     
     private func makeSUT(
@@ -57,6 +74,13 @@ final class CacheFeedUseCaseTests: XCTestCase {
         trackMemoryLeaks(store, file: file, line: line)
         trackMemoryLeaks(sut, file: file, line: line)
         return (sut, store)
+    }
+    
+    private var anyError: NSError {
+        NSError(
+            domain: "any error",
+            code: 0
+        )
     }
     
     private func uniqueItem() -> FeedItem {
