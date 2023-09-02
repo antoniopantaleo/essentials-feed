@@ -10,15 +10,17 @@ import EssentialFeed
 
 class LocalFeedLoader {
     private var store: FeedStore
+    private var currentDate: () -> Date
     
-    init(store: FeedStore) {
+    init(store: FeedStore, currentDate: @escaping () -> Date) {
         self.store = store
+        self.currentDate = currentDate
     }
     
     func save(_ items: [FeedItem]) {
-        store.deleteChachedFeeds { [unowned store] error in
+        store.deleteChachedFeeds { [unowned self] error in
             if error == nil {
-                store.insert()
+                store.insert(items, timestamp: self.currentDate())
             }
         }
     }
@@ -27,8 +29,10 @@ class LocalFeedLoader {
 /// This class help us to abstract the framework we are going to use from the tests
 class FeedStore {
     typealias DeletionCompletion = ((Error?) -> Void)
+    
     private(set) var deleteCacheFeedCallCount: Int = 0
     private(set) var insertCallCount = 0
+    private(set) var insertions = [(items: [FeedItem], timestamp: Date)]()
     
     private var deletionCompletions: [DeletionCompletion] = []
     
@@ -37,8 +41,9 @@ class FeedStore {
         deletionCompletions.append(completion)
     }
     
-    func insert() {
+    func insert(_ items: [FeedItem], timestamp: Date) {
         insertCallCount += 1
+        insertions.append((items, timestamp))
     }
     
     func completeDeletion(with error: Error, at index: Int = 0) {
@@ -90,14 +95,29 @@ final class CacheFeedUseCaseTests: XCTestCase {
         XCTAssertEqual(store.insertCallCount, 1)
     }
     
+    func test_save_requestNewCacheInsertionWithTimestampOnSuccesfulDeletion() {
+        // Given
+        let timestamp = Date()
+        let (sut, store) = makeSUT(currentDate: { timestamp })
+        let items = [uniqueItem(), uniqueItem()]
+        // When
+        sut.save(items)
+        store.completeDeletionSuccessfully()
+        // Then
+        XCTAssertEqual(store.insertions.count, 1)
+        XCTAssertEqual(store.insertions.first?.items, items)
+        XCTAssertEqual(store.insertions.first?.timestamp, timestamp)
+    }
+    
     // MARK: Helpers
     
     private func makeSUT(
+        currentDate: @escaping () -> Date = Date.init,
         file: StaticString = #file,
         line: UInt = #line
     ) -> (sut: LocalFeedLoader, store: FeedStore) {
         let store = FeedStore()
-        let sut = LocalFeedLoader(store: store)
+        let sut = LocalFeedLoader(store: store, currentDate: currentDate)
         trackMemoryLeaks(store, file: file, line: line)
         trackMemoryLeaks(sut, file: file, line: line)
         return (sut, store)
