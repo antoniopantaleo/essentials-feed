@@ -12,16 +12,16 @@ final class EssentialFeedAPIEndToEndTests: XCTestCase {
 
     func test_endToEndTestServerGETFeedResult_matchesFixedTestAccountData() {
         let result = getFeedResult()
-        if case .success(let items) = result {
-            XCTAssertEqual(items.count, 8, "Expected 8 items in the test service")
-            XCTAssertEqual(items[0], self.expectedItem(at: 0))
-            XCTAssertEqual(items[1], self.expectedItem(at: 1))
-            XCTAssertEqual(items[2], self.expectedItem(at: 2))
-            XCTAssertEqual(items[3], self.expectedItem(at: 3))
-            XCTAssertEqual(items[4], self.expectedItem(at: 4))
-            XCTAssertEqual(items[5], self.expectedItem(at: 5))
-            XCTAssertEqual(items[6], self.expectedItem(at: 6))
-            XCTAssertEqual(items[7], self.expectedItem(at: 7))
+        if case .success(let imageFeed) = result {
+            XCTAssertEqual(imageFeed.count, 8, "Expected 8 images in the test service")
+            XCTAssertEqual(imageFeed[0], self.expectedImage(at: 0))
+            XCTAssertEqual(imageFeed[1], self.expectedImage(at: 1))
+            XCTAssertEqual(imageFeed[2], self.expectedImage(at: 2))
+            XCTAssertEqual(imageFeed[3], self.expectedImage(at: 3))
+            XCTAssertEqual(imageFeed[4], self.expectedImage(at: 4))
+            XCTAssertEqual(imageFeed[5], self.expectedImage(at: 5))
+            XCTAssertEqual(imageFeed[6], self.expectedImage(at: 6))
+            XCTAssertEqual(imageFeed[7], self.expectedImage(at: 7))
             
         } else {
             XCTFail("Expected success, got \(String(describing: result)) instead")
@@ -49,12 +49,12 @@ final class EssentialFeedAPIEndToEndTests: XCTestCase {
         return returnedResult
     }
     
-    private func expectedItem(at index: Int) -> FeedItem {
-        FeedItem(
+    private func expectedImage(at index: Int) -> FeedImage {
+        FeedImage(
             id: id(at: index),
             description: description(at: index),
             location: location(at: index),
-            imageURL: imageURL(at: index)
+            url: imageURL(at: index)
         )
     }
     
