@@ -7,14 +7,6 @@
 
 import Foundation
 
-/// This is a FeedItem DTO representation only used by the API module
-struct RemoteFeedItem: Decodable {
-    let id: UUID
-    let description: String?
-    let location: String?
-    let image: URL
-}
-
 final class FeedItemsMapper {
     private static let decoder = JSONDecoder()
     private static let OK_200 = 200
