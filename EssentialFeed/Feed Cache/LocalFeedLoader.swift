@@ -20,11 +20,14 @@ public final class LocalFeedLoader {
     }
     
     public func load(completion: @escaping (LoadResult) -> Void) {
-        store.retrieve { error in
-            if let error = error {
-                completion(.failure(error))
-            } else {
-                completion(.success([]))
+        store.retrieve { result in
+            switch result {
+                case .empty:
+                    completion(.success([]))
+                case let .failure(error):
+                    completion(.failure(error))
+                case let .found(feed, _):
+                    completion(.success(feed.toFeedImage))
             }
         }
     }
@@ -42,7 +45,7 @@ public final class LocalFeedLoader {
     
     private func cache(_ feed: [FeedImage], with completion: @escaping (SaveResult) -> Void) {
         store.insert(
-            feed.toLocalFeedIdem,
+            feed.toLocalFeedItem,
             timestamp: self.currentDate(),
             completion: { [weak self] error in
                 guard self != nil else { return }
@@ -53,9 +56,22 @@ public final class LocalFeedLoader {
 }
 
 fileprivate extension Array where Element == FeedImage {
-    var toLocalFeedIdem: [LocalFeedImage] {
+    var toLocalFeedItem: [LocalFeedImage] {
         map {
             LocalFeedImage(
+                id: $0.id,
+                description: $0.description,
+                location: $0.location,
+                url: $0.url
+            )
+        }
+    }
+}
+
+fileprivate extension Array where Element == LocalFeedImage {
+    var toFeedImage: [FeedImage] {
+        map {
+            FeedImage(
                 id: $0.id,
                 description: $0.description,
                 location: $0.location,
