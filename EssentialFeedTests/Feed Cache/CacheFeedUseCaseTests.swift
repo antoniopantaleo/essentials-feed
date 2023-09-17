@@ -29,7 +29,7 @@ final class CacheFeedUseCaseTests: XCTestCase {
         // Given
         let (sut, store) = makeSUT()
         let (feed, _) = uniqueImageFeed()
-        let deletionError = anyError
+        let deletionError = anyNSError
         // When
         sut.save(feed) { _ in }
         store.completeDeletion(with: deletionError)
@@ -40,7 +40,7 @@ final class CacheFeedUseCaseTests: XCTestCase {
     func test_save_failsOnDeletionError() {
         // Given
         let (sut, store) = makeSUT()
-        let deletionError = anyError
+        let deletionError = anyNSError
         expect(
             sut,
             toCompleteWithError: deletionError,
@@ -53,7 +53,7 @@ final class CacheFeedUseCaseTests: XCTestCase {
     func test_save_failsOnInsertionError() {
         // Given
         let (sut, store) = makeSUT()
-        let insertionError = anyError
+        let insertionError = anyNSError
         expect(
             sut,
             toCompleteWithError: insertionError,
@@ -108,7 +108,7 @@ final class CacheFeedUseCaseTests: XCTestCase {
         // When
         sut?.save(feed, completion: { receivedResults.append($0) })
         sut = nil
-        store.completeDeletion(with: anyError)
+        store.completeDeletion(with: anyNSError)
         // Then
         XCTAssertTrue(receivedResults.isEmpty)
     }
@@ -122,7 +122,7 @@ final class CacheFeedUseCaseTests: XCTestCase {
         sut?.save([uniqueImage()], completion: { receivedResults.append($0) })
         store.completeDeletionSuccessfully()
         sut = nil
-        store.completeInsertion(with: anyError)
+        store.completeInsertion(with: anyNSError)
         // Then
         XCTAssertTrue(receivedResults.isEmpty)
     }
@@ -165,34 +165,4 @@ final class CacheFeedUseCaseTests: XCTestCase {
             line: line
         )
     }
-    
-    private var anyError: NSError {
-        NSError(
-            domain: "any error",
-            code: 0
-        )
-    }
-    
-    private func uniqueImage() -> FeedImage {
-        FeedImage(
-            id: UUID(),
-            description: "any description",
-            location: "any location",
-            url: URL(string: "https://any-url.com")!
-        )
-    }
-    
-    private func uniqueImageFeed() -> (items: [FeedImage], localFeedItems: [LocalFeedImage]) {
-        let items = [uniqueImage(), uniqueImage()]
-        let localFeedItems = items.map {
-            LocalFeedImage(
-                id: $0.id,
-                description: $0.description,
-                location: $0.location,
-                url: $0.url
-            )
-        }
-        return (items, localFeedItems)
-    }
-    
 }
