@@ -40,8 +40,14 @@ public final class LocalFeedLoader {
     }
 
     public func validateCache() {
-        store.retrieve { _ in }
-        store.deleteChachedFeeds { _ in }
+        store.retrieve { [unowned self] result in
+            switch result {
+                case .failure:
+                    store.deleteChachedFeeds { _ in }
+                default:
+                    break
+            }
+        }
     }
     
     
