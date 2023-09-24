@@ -42,11 +42,12 @@ class CodableFeedStore {
         }
     }
     
-    private let storeURL = FileManager
-        .default
-        .urls(for: .documentDirectory, in: .userDomainMask)
-        .first!
-        .appending(path: "image-feed.store", directoryHint: .notDirectory)
+    
+    private let storeURL: URL
+    
+    init(storeURL: URL) {
+        self.storeURL = storeURL
+    }
     
     func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping FeedStore.InsertionCompletion) {
         let encoder = JSONEncoder()
@@ -143,7 +144,12 @@ final class CodableFeedStoreTests: XCTestCase {
     // MARK: Helpers
     
     private func makeSUT(file: StaticString = #file, line: UInt = #line) -> CodableFeedStore {
-        let sut = CodableFeedStore()
+        let url = FileManager
+            .default
+            .urls(for: .documentDirectory, in: .userDomainMask)
+            .first!
+            .appending(path: "image-feed.store", directoryHint: .notDirectory)
+        let sut = CodableFeedStore(storeURL: url)
         trackMemoryLeaks(sut, file: file, line: line)
         return sut
     }
