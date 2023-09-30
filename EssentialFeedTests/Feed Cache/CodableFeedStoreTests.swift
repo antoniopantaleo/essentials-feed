@@ -82,17 +82,7 @@ final class CodableFeedStoreTests: XCTestCase {
 
     func test_retrieve_deliversEmptyOnEmptyCache() {
         let sut = makeSUT()
-        let expectation = expectation(description: "Wait for completion")
-        sut.retrieve { result in
-            switch result {
-            case .empty:
-                break
-            default:
-                return XCTFail("Expected empty result, got \(result) instead")
-            }
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1.0)
+        expect(sut, toRetrieve: .empty)
     }
     
     func test_retrieve_hasNoSideEffectsOnEmptyCache() {
@@ -119,18 +109,11 @@ final class CodableFeedStoreTests: XCTestCase {
         let expectation = expectation(description: "Wait for completion")
         sut.insert(feed, timestamp: timestamp) { insertionError in
             XCTAssertNil(insertionError, "Expected feed to be inserted successfully")
-            sut.retrieve { retrieveResult in
-                switch retrieveResult {
-                case .found(let retrievedFeed, let retrievedTimestamp):
-                    XCTAssertEqual(feed, retrievedFeed)
-                    XCTAssertEqual(timestamp, retrievedTimestamp)
-                default:
-                    return XCTFail("Expected found result with \(feed) and \(timestamp), got \(retrieveResult) instead")
-                }
-                expectation.fulfill()
-            }
+            expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1.0)
+        
+        expect(sut, toRetrieve: .found(feed: feed, timestamp: timestamp))
     }
     
     func test_retrieve_hasNoSideEffectsOnNonEmptyCache() {
@@ -185,6 +168,32 @@ final class CodableFeedStoreTests: XCTestCase {
     
     private func deleteStoreArtifacts() {
         try? FileManager.default.removeItem(at: testSpecificStoreURL)
+    }
+    
+    private func expect(
+        _ sut: CodableFeedStore,
+        toRetrieve expectedResult: RetrieveCahedFeedResult,
+        file: StaticString = #file,
+        line: UInt = #line
+    ) {
+        let expectation = expectation(description: "Wait for completion")
+        sut.retrieve { retrievedResult in
+            switch (expectedResult, retrievedResult) {
+                case (.empty, .empty):
+                    break
+                case let (.found(expectedFeed, expectedTimestamp), .found(retrievedFeed, retrievedTimestamp)):
+                    XCTAssertEqual(expectedFeed, retrievedFeed, file: file, line: line)
+                    XCTAssertEqual(expectedTimestamp, retrievedTimestamp, file: file, line: line)
+                default:
+                    XCTFail(
+                        "Expected to retrieve \(expectedResult), got \(retrievedResult) instead",
+                        file: file,
+                        line: line
+                    )
+            }
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1.0)
     }
 
 }
