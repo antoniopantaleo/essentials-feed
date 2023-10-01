@@ -95,6 +95,16 @@ final class CodableFeedStoreTests: XCTestCase {
         XCTAssertNotNil(insertionError, "Expected cache insertion to fail with an error")
     }
     
+    func test_insert_hasNoSideEffectsOnInsertionError() {
+        let invalidStoreURL = URL(string: "invalid://store-url")!
+        let sut = makeSUT(storeURL: invalidStoreURL)
+        let feed = uniqueImageFeed().localFeedItems
+        let timestamp = Date()
+        
+        insert((feed, timestamp), to: sut)
+        expect(sut, toRetrieve: .empty)
+    }
+    
     func test_storeSideEffects_runSerially() {
         let sut = makeSUT()
         var completedOperationsInOrder = [XCTestExpectation]()
