@@ -44,7 +44,11 @@ public class CodableFeedStore: FeedStore {
     private let storeURL: URL
     
     /// This is by default a backgronud thread, but operations run serially, insted of DispatchQueue.global().async, which runs concurrently.
-    private let backgroundSerialQueue = DispatchQueue(label: "\(CodableFeedStore.self)Queue", qos: .userInitiated)
+    private let backgroundSerialQueue = DispatchQueue(
+        label: "\(CodableFeedStore.self)Queue",
+        qos: .userInitiated,
+        attributes: .concurrent
+    )
     
     public init(storeURL: URL) {
         self.storeURL = storeURL
@@ -53,7 +57,7 @@ public class CodableFeedStore: FeedStore {
     public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
         // This allows us to capture self.storeURL without capturing self, which would create a retain cycle.
         let storeURL = self.storeURL
-        backgroundSerialQueue.async {
+        backgroundSerialQueue.async(flags: .barrier) {
             do {
                 let encoder = JSONEncoder()
                 let cache = Cache(feed: feed.map(CodableLocalFeedImage.init), timestamp: timestamp)
@@ -86,7 +90,7 @@ public class CodableFeedStore: FeedStore {
     public func deleteChachedFeeds(completion: @escaping DeletionCompletion) {
         // This allows us to capture self.storeURL without capturing self, which would create a retain cycle.
         let storeURL = self.storeURL
-        backgroundSerialQueue.async {
+        backgroundSerialQueue.async(flags: .barrier) {
             guard FileManager.default.fileExists(atPath: storeURL.path) else {
                 return completion(nil)
             }
