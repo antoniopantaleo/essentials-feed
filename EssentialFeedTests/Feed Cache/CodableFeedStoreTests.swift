@@ -157,53 +157,5 @@ final class CodableFeedStoreTests: XCTestCase, FailableFeedStoreSpecs {
     private func deleteStoreArtifacts() {
         try? FileManager.default.removeItem(at: testSpecificStoreURL)
     }
-    
-    @discardableResult
-    private func insert(_ cache: (feed: [LocalFeedImage], timestamp: Date), to sut: any FeedStore) -> Error?{
-        let expectation = expectation(description: "Wait for cache insertion")
-        var receivedError: Error? = nil
-        sut.insert(cache.feed, timestamp: cache.timestamp) { insertionError in
-            receivedError = insertionError
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1.0)
-        return receivedError
-    }
-    
-    private func expect(
-        _ sut: any FeedStore,
-        toRetrieve expectedResult: RetrieveCahedFeedResult,
-        file: StaticString = #file,
-        line: UInt = #line
-    ) {
-        let expectation = expectation(description: "Wait for completion")
-        sut.retrieve { retrievedResult in
-            switch (expectedResult, retrievedResult) {
-                case (.empty, .empty), (.failure, .failure):
-                    break
-                case let (.found(expectedFeed, expectedTimestamp), .found(retrievedFeed, retrievedTimestamp)):
-                    XCTAssertEqual(expectedFeed, retrievedFeed, file: file, line: line)
-                    XCTAssertEqual(expectedTimestamp, retrievedTimestamp, file: file, line: line)
-                default:
-                    XCTFail(
-                        "Expected to retrieve \(expectedResult), got \(retrievedResult) instead",
-                        file: file,
-                        line: line
-                    )
-            }
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1.0)
-    }
-    
-    private func expect(
-        _ sut: any FeedStore,
-        toRetrieveTwice expectedResult: RetrieveCahedFeedResult,
-        file: StaticString = #file,
-        line: UInt = #line
-    ) {
-        expect(sut, toRetrieve: expectedResult, file: file, line: line)
-        expect(sut, toRetrieve: expectedResult, file: file, line: line)
-    }
 
 }
