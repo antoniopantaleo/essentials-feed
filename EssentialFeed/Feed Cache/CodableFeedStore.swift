@@ -43,44 +43,59 @@ public class CodableFeedStore: FeedStore {
     
     private let storeURL: URL
     
+    /// This is by default a backgronud thread, but operations run serially, insted of DispatchQueue.global().async, which runs concurrently.
+    private let backgroundSerialQueue = DispatchQueue(label: "\(CodableFeedStore.self)Queue", qos: .userInitiated)
+    
     public init(storeURL: URL) {
         self.storeURL = storeURL
     }
     
     public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-        do {
-            let encoder = JSONEncoder()
-            let cache = Cache(feed: feed.map(CodableLocalFeedImage.init), timestamp: timestamp)
-            let encoded = try encoder.encode(cache)
-            try encoded.write(to:  storeURL)
-            completion(nil)
-        } catch {
-            completion(error)
+        // This allows us to capture self.storeURL without capturing self, which would create a retain cycle.
+        let storeURL = self.storeURL
+        backgroundSerialQueue.async {
+            do {
+                let encoder = JSONEncoder()
+                let cache = Cache(feed: feed.map(CodableLocalFeedImage.init), timestamp: timestamp)
+                let encoded = try encoder.encode(cache)
+                try encoded.write(to:  storeURL)
+                completion(nil)
+            } catch {
+                completion(error)
+            }
         }
     }
     
     public func retrieve(completion: @escaping RetrievalCompletion) {
-        guard let data = try? Data(contentsOf: storeURL) else {
-            return completion(.empty)
-        }
-        let decoder = JSONDecoder()
-        do {
-            let cache = try decoder.decode(Cache.self, from: data)
-            completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
-        } catch {
-            completion(.failure(error))
+        // This allows us to capture self.storeURL without capturing self, which would create a retain cycle.
+        let storeURL = self.storeURL
+        backgroundSerialQueue.async {
+            guard let data = try? Data(contentsOf: storeURL) else {
+                return completion(.empty)
+            }
+            let decoder = JSONDecoder()
+            do {
+                let cache = try decoder.decode(Cache.self, from: data)
+                completion(.found(feed: cache.localFeed, timestamp: cache.timestamp))
+            } catch {
+                completion(.failure(error))
+            }
         }
     }
     
     public func deleteChachedFeeds(completion: @escaping DeletionCompletion) {
-        guard FileManager.default.fileExists(atPath: storeURL.path) else {
-            return completion(nil)
-        }
-        do {
-            try FileManager.default.removeItem(at: storeURL)
-            completion(nil)
-        } catch {
-            completion(error)
+        // This allows us to capture self.storeURL without capturing self, which would create a retain cycle.
+        let storeURL = self.storeURL
+        backgroundSerialQueue.async {
+            guard FileManager.default.fileExists(atPath: storeURL.path) else {
+                return completion(nil)
+            }
+            do {
+                try FileManager.default.removeItem(at: storeURL)
+                completion(nil)
+            } catch {
+                completion(error)
+            }
         }
     }
     
