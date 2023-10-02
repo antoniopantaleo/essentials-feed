@@ -1,5 +1,5 @@
 //
-//  RemoteFeedLoaderTests.swift
+//  LoadFeedFromRemoteUseCaseTests.swift
 //  EssentialFeedTests
 //
 //  Created by Antonio on 19/08/23.
@@ -8,7 +8,7 @@
 import XCTest
 import EssentialFeed
 
-final class RemoteFeedLoaderTests: XCTestCase {
+final class LoadFeedFromRemoteUseCaseTests: XCTestCase {
     
     func test_init_doesNotRequestDataFromURL() {
         let (_, client) = makeSUT()
@@ -159,12 +159,12 @@ final class RemoteFeedLoaderTests: XCTestCase {
         description: String? = nil,
         location: String? = nil,
         imageURL: URL
-    ) -> (model: FeedItem, json: [String: Any]) {
-        let model = FeedItem(
+    ) -> (model: FeedImage, json: [String: Any]) {
+        let model = FeedImage(
             id: id,
             description: description,
             location: location,
-            imageURL: imageURL
+            url: imageURL
         )
         
         /// We use compact map to remove optional values
@@ -174,7 +174,7 @@ final class RemoteFeedLoaderTests: XCTestCase {
             "id": model.id.uuidString,
             "description": model.description,
             "location": model.location,
-            "image": model.imageURL.absoluteString
+            "image": model.url.absoluteString
         ].compactMapValues { $0 }
         
         return (model, json)

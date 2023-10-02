@@ -34,7 +34,7 @@ final class URLSessionHTTPClientTests: XCTestCase {
     }
     
     func test_getFromURL_failsOnRequestError() {
-        let requestError = anyError as NSError
+        let requestError = anyNSError
         let receivedError = resultErrorFor(data: nil, response: nil, error: requestError) as? NSError
         XCTAssertEqual(receivedError?.domain, requestError.domain)
         XCTAssertEqual(receivedError?.code, requestError.code)
@@ -44,11 +44,11 @@ final class URLSessionHTTPClientTests: XCTestCase {
         XCTAssertNotNil(resultErrorFor(data: nil, response: nil, error: nil))
         XCTAssertNotNil(resultErrorFor(data: nil, response: nonHTTPURLResponse, error: nil))
         XCTAssertNotNil(resultErrorFor(data: anyData, response: nil, error: nil))
-        XCTAssertNotNil(resultErrorFor(data: anyData, response: nil, error: anyError))
-        XCTAssertNotNil(resultErrorFor(data: nil, response: nonHTTPURLResponse, error: anyError))
-        XCTAssertNotNil(resultErrorFor(data: nil, response: anyHTTPURLResponse, error: anyError))
-        XCTAssertNotNil(resultErrorFor(data: anyData, response: nonHTTPURLResponse, error: anyError))
-        XCTAssertNotNil(resultErrorFor(data: anyData, response: anyHTTPURLResponse, error: anyError))
+        XCTAssertNotNil(resultErrorFor(data: anyData, response: nil, error: anyNSError))
+        XCTAssertNotNil(resultErrorFor(data: nil, response: nonHTTPURLResponse, error: anyNSError))
+        XCTAssertNotNil(resultErrorFor(data: nil, response: anyHTTPURLResponse, error: anyNSError))
+        XCTAssertNotNil(resultErrorFor(data: anyData, response: nonHTTPURLResponse, error: anyNSError))
+        XCTAssertNotNil(resultErrorFor(data: anyData, response: anyHTTPURLResponse, error: anyNSError))
         XCTAssertNotNil(resultErrorFor(data: anyData, response: nonHTTPURLResponse, error: nil))
     }
     
@@ -73,10 +73,6 @@ final class URLSessionHTTPClientTests: XCTestCase {
     
     // MARK: Helpers
     
-    private var anyURL: URL {
-        URL(string: "https://any-url.com")!
-    }
-    
     private var nonHTTPURLResponse: URLResponse {
         URLResponse(
             url: anyURL,
@@ -97,10 +93,6 @@ final class URLSessionHTTPClientTests: XCTestCase {
     
     private var anyData: Data {
         Data("any data".utf8)
-    }
-    
-    private var anyError: Error {
-        NSError(domain: "any error", code: 0)
     }
     
     private func makeSUT(file: StaticString = #file, line: UInt = #line) -> HTTPClient {
