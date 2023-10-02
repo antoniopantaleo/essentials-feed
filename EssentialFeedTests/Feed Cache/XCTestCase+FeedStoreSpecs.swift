@@ -10,6 +10,10 @@ import EssentialFeed
 
 extension FeedStoreSpecs where Self: XCTestCase {
     
+    func assertThatRetrieveDeliversEmptyOnEmptyCache(on sut: any FeedStore, file: StaticString = #file, line: UInt = #line) {
+        expect(sut, toRetrieve: .empty, file: file, line: line)
+    }
+    
     @discardableResult
     func insert(_ cache: (feed: [LocalFeedImage], timestamp: Date), to sut: any FeedStore) -> Error?{
         let expectation = expectation(description: "Wait for cache insertion")
