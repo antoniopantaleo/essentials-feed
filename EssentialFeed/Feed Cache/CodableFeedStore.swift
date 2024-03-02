@@ -87,7 +87,7 @@ public class CodableFeedStore: FeedStore {
         }
     }
     
-    public func deleteCachedFeeds(completion: @escaping DeletionCompletion) {
+    public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
         // This allows us to capture self.storeURL without capturing self, which would create a retain cycle.
         let storeURL = self.storeURL
         backgroundSerialQueue.async(flags: .barrier) {
