@@ -6,6 +6,23 @@
 //
 
 import XCTest
+import EssentialFeed
+
+class CoreDataFeedStore: FeedStore {
+
+    func retrieve(completion: @escaping RetrievalCompletion) {
+        
+    }
+    
+    func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
+        
+    }
+
+    func deleteCachedFeed(completion: @escaping DeletionCompletion) {
+        
+    }
+
+}
 
 final class CoreDataFeedStoreTests: XCTestCase, FeedStoreSpecs {
     
@@ -55,6 +72,13 @@ final class CoreDataFeedStoreTests: XCTestCase, FeedStoreSpecs {
     
     func test_storeSideEffects_runSerially() {
         
+    }
+    
+    //MARK: Helpers
+    private func makeSUT(file: StaticString = #file, line: UInt = #line) -> CoreDataFeedStore {
+        let sut = CoreDataFeedStore()
+        trackMemoryLeaks(sut, file: file, line: line)
+        return sut
     }
     
     
