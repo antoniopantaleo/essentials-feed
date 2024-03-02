@@ -14,8 +14,8 @@ class CoreDataFeedStore: FeedStore {
     private let container: NSPersistentContainer
     private let context: NSManagedObjectContext
     
-    init(bundle: Bundle = .main) throws {
-        container = try NSPersistentContainer.load(modelName: "FeedStore", in: bundle)
+    init(storeURL: URL, bundle: Bundle = .main) throws {
+        container = try NSPersistentContainer.load(modelName: "FeedStore", storeURL: storeURL, in: bundle)
         context = container.newBackgroundContext()
     }
 
@@ -45,12 +45,13 @@ private extension NSPersistentContainer {
         try loadingError.map { throw LoadingError.failedToLoad($0) }
     }
     
-    static func load(modelName: String, in bundle: Bundle) throws -> NSPersistentContainer {
+    static func load(modelName: String, storeURL: URL, in bundle: Bundle) throws -> NSPersistentContainer {
         guard let model = NSManagedObjectModel.with(modelName: modelName, in: bundle) else {
             throw LoadingError.modelNotFound
         }
-        
+        let description = NSPersistentStoreDescription(url: storeURL)
         let container = NSPersistentContainer(name: modelName, managedObjectModel: model)
+        container.persistentStoreDescriptions = [description]
         try container.loadPersistentStores()
         return container
     }
@@ -121,7 +122,8 @@ final class CoreDataFeedStoreTests: XCTestCase, FeedStoreSpecs {
     //MARK: Helpers
     private func makeSUT(file: StaticString = #file, line: UInt = #line) -> CoreDataFeedStore {
         let bundle = Bundle(for: ManagedCache.self)
-        let sut = try! CoreDataFeedStore(bundle: bundle)
+        let storeURL = URL(fileURLWithPath: "/dev/null")
+        let sut = try! CoreDataFeedStore(storeURL: storeURL, bundle: bundle)
         trackMemoryLeaks(sut, file: file, line: line)
         return sut
     }
