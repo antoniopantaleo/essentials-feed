@@ -11,7 +11,7 @@ import EssentialFeed
 class CoreDataFeedStore: FeedStore {
 
     func retrieve(completion: @escaping RetrievalCompletion) {
-        
+        completion(.empty)
     }
     
     func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
@@ -27,7 +27,8 @@ class CoreDataFeedStore: FeedStore {
 final class CoreDataFeedStoreTests: XCTestCase, FeedStoreSpecs {
     
     func test_retrieve_deliversEmptyOnEmptyCache() {
-        
+        let sut = makeSUT()
+        assertThatRetrieveDeliversEmptyOnEmptyCache(on: sut)
     }
     
     func test_retrieve_hasNoSideEffectsOnEmptyCache() {
