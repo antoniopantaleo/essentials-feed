@@ -105,6 +105,34 @@ final class CodableFeedStoreTests: XCTestCase, FailableFeedStoreSpecs {
         expect(sut, toRetrieve: .empty)
     }
     
+    func test_delete_hasNoSideEffectsOnEmptyCache() {
+        let sut = makeSUT()
+        
+        let deletionError = deleteCache(from: sut)
+        
+        XCTAssertNil(deletionError, "Expected empty cache deletion to succeed")
+        expect(sut, toRetrieve: .empty)
+    }
+    
+    func test_delete_emptiesPreviouslyInsertedCache() {
+        let sut = makeSUT()
+        insert((uniqueImageFeed().localFeedItems, Date()), to: sut)
+        
+        let deletionError = deleteCache(from: sut)
+        
+        XCTAssertNil(deletionError, "Expected non-empty cache deletion to succeed")
+        expect(sut, toRetrieve: .empty)
+    }
+    
+    func test_delete_deliversErrorOnDeletionError() {
+        let noDeletePermissionURL = cachesDirectory
+        let sut = makeSUT(storeURL: noDeletePermissionURL)
+        
+        let deletionError = deleteCache(from: sut)
+        
+        XCTAssertNotNil(deletionError, "Expected cache deletion to fail")
+    }
+    
     func test_storeSideEffects_runSerially() {
         let sut = makeSUT()
         var completedOperationsInOrder = [XCTestExpectation]()
@@ -139,11 +167,26 @@ final class CodableFeedStoreTests: XCTestCase, FailableFeedStoreSpecs {
     }
     
     private var testSpecificStoreURL: URL {
+        cachesDirectory
+            .appending(path: "\(type(of: self)).store", directoryHint: .notDirectory)
+    }
+    
+    private var cachesDirectory: URL {
         FileManager
             .default
             .urls(for: .cachesDirectory, in: .userDomainMask)
             .first!
-            .appending(path: "\(type(of: self)).store", directoryHint: .notDirectory)
+    }
+    
+    private func deleteCache(from sut: any FeedStore) -> Error? {
+        let expectation = expectation(description: "Waiting for cache deletion")
+        var deletionError: Error?
+        sut.deleteCachedFeed { error in
+            deletionError = error
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1.0)
+        return deletionError
     }
     
     private func setupEmptyStoreState() {
