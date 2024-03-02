@@ -12,9 +12,11 @@ import EssentialFeed
 class CoreDataFeedStore: FeedStore {
     
     private let container: NSPersistentContainer
+    private let context: NSManagedObjectContext
     
     init(bundle: Bundle = .main) throws {
         container = try NSPersistentContainer.load(modelName: "FeedStore", in: bundle)
+        context = container.newBackgroundContext()
     }
 
     func retrieve(completion: @escaping RetrievalCompletion) {
