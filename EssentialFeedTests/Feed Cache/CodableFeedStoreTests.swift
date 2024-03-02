@@ -214,18 +214,6 @@ final class CodableFeedStoreTests: XCTestCase, FailableFeedStore {
             .first!
     }
     
-    @discardableResult
-    private func deleteCache(from sut: any FeedStore) -> Error? {
-        let expectation = expectation(description: "Waiting for cache deletion")
-        var deletionError: Error?
-        sut.deleteCachedFeed { error in
-            deletionError = error
-            expectation.fulfill()
-        }
-        wait(for: [expectation], timeout: 1.0)
-        return deletionError
-    }
-    
     private func setupEmptyStoreState() {
         deleteStoreArtifacts()
     }

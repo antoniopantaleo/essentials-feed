@@ -26,6 +26,18 @@ extension FeedStoreSpecs where Self: XCTestCase {
         return receivedError
     }
     
+    @discardableResult
+    func deleteCache(from sut: any FeedStore) -> Error? {
+        let expectation = expectation(description: "Waiting for cache deletion")
+        var deletionError: Error?
+        sut.deleteCachedFeed { error in
+            deletionError = error
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1.0)
+        return deletionError
+    }
+    
     func expect(
         _ sut: any FeedStore,
         toRetrieve expectedResult: RetrieveCahedFeedResult,
