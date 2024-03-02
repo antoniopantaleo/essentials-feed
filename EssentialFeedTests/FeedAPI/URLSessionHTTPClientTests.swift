@@ -124,7 +124,7 @@ final class URLSessionHTTPClientTests: XCTestCase {
         line: UInt = #line
     ) -> (data: Data?, response: HTTPURLResponse?) {
         let result = resultFor(data: data, response: response, error: error, file: file, line: line)
-        guard case .success(let data, let response) = result else {
+        guard case .success((let data, let response)) = result else {
             XCTFail("Expected success got \(result) instead")
             return (nil, nil)
         }
