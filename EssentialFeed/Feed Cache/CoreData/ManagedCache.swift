@@ -15,6 +15,11 @@ public class ManagedCache: NSManagedObject, Identifiable {
     @NSManaged public var timestamp: Date
     @NSManaged public var feed: NSOrderedSet
     
+    public static func newUniqueInstance(in context: NSManagedObjectContext) throws -> ManagedCache {
+        try find(in: context).map(context.delete)
+        return ManagedCache(context: context)
+    }
+    
     public static func find(in context: NSManagedObjectContext) throws -> ManagedCache? {
         let request = NSFetchRequest<ManagedCache>(entityName: entity().name!)
         request.returnsObjectsAsFaults = false
