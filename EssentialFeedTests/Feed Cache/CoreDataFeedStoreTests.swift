@@ -6,9 +6,16 @@
 //
 
 import XCTest
+import CoreData
 import EssentialFeed
 
 class CoreDataFeedStore: FeedStore {
+    
+    private let container: NSPersistentContainer
+    
+    init(bundle: Bundle = .main) throws {
+        container = try NSPersistentContainer.load(modelName: "FeedStore", in: bundle)
+    }
 
     func retrieve(completion: @escaping RetrievalCompletion) {
         completion(.empty)
@@ -23,6 +30,39 @@ class CoreDataFeedStore: FeedStore {
     }
 
 }
+
+private extension NSPersistentContainer {
+    enum LoadingError: Error {
+        case modelNotFound
+        case failedToLoad(Error)
+    }
+    
+    func loadPersistentStores() throws {
+        var loadingError: Error?
+        self.loadPersistentStores { loadingError = $1 }
+        try loadingError.map { throw LoadingError.failedToLoad($0) }
+    }
+    
+    static func load(modelName: String, in bundle: Bundle) throws -> NSPersistentContainer {
+        guard let model = NSManagedObjectModel.with(modelName: modelName, in: bundle) else {
+            throw LoadingError.modelNotFound
+        }
+        
+        let container = NSPersistentContainer(name: modelName, managedObjectModel: model)
+        try container.loadPersistentStores()
+        return container
+    }
+}
+
+private extension NSManagedObjectModel {
+    static func with(modelName: String, in bundle: Bundle) -> NSManagedObjectModel? {
+        bundle
+            .url(forResource: modelName, withExtension: "momd")
+            .flatMap { NSManagedObjectModel(contentsOf: $0) }
+    }
+}
+
+//MARK: Tests
 
 final class CoreDataFeedStoreTests: XCTestCase, FeedStoreSpecs {
     
@@ -78,7 +118,8 @@ final class CoreDataFeedStoreTests: XCTestCase, FeedStoreSpecs {
     
     //MARK: Helpers
     private func makeSUT(file: StaticString = #file, line: UInt = #line) -> CoreDataFeedStore {
-        let sut = CoreDataFeedStore()
+        let bundle = Bundle(for: ManagedCache.self)
+        let sut = try! CoreDataFeedStore(bundle: bundle)
         trackMemoryLeaks(sut, file: file, line: line)
         return sut
     }
