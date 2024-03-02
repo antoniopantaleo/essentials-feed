@@ -145,8 +145,8 @@ final class URLSessionHTTPClientTests: XCTestCase {
         let expectation = expectation(description: "Wait for completion")
         sut.get(from: anyURL) { result in
             switch result {
-            case .success(let data, let response):
-                receivedResult = .success(data, response)
+            case .success((let data, let response)):
+                receivedResult = .success((data, response))
             case .failure(let error):
                 receivedResult = .failure(error)
             }

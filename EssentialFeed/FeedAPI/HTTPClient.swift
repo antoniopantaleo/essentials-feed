@@ -7,10 +7,7 @@
 
 import Foundation
 
-public enum HTTPClientResult {
-    case success(Data, HTTPURLResponse)
-    case failure(Error)
-}
+public typealias HTTPClientResult = Result<(Data, HTTPURLResponse), Error>
 
 /// Public because it can be implemented by external modules
 public protocol HTTPClient {
