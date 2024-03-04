@@ -10,6 +10,10 @@ import UIKit
 
 extension FeedViewController {
     
+    var isShowingLoadingIndicator: Bool {
+        refreshControl?.isRefreshing == true
+    }
+    
     func simulateAppearance() {
         if !isViewLoaded {
             loadViewIfNeeded()
