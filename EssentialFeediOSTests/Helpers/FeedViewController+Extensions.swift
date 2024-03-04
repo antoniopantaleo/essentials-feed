@@ -5,8 +5,8 @@
 //  Created by Antonio on 04/03/24.
 //
 
-import Foundation
 import UIKit
+import EssentialFeediOS
 
 extension FeedViewController {
     
