@@ -23,7 +23,7 @@ extension FeedViewController {
         }
     }
     
-    func simulatePullToRefresh() {
+    func simulateUserInitiatedFeedReload() {
         refreshControl?.simulatePullToRefresh()
     }
     
