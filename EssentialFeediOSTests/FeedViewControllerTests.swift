@@ -50,6 +50,17 @@ final class FeedViewControllerTests: XCTestCase {
         XCTAssertFalse(sut.isShowingLoadingIndicator)
     }
     
+    func test_loadFeedCompletion_rendersSuccesfullyLoadedFeed() {
+        let image = makeImage()
+        let (sut, loader) = makeSUT()
+        sut.simulateAppearance()
+        
+        XCTAssertEqual(sut.numberOfRenderedFeedImageViews, 0)
+        
+        loader.completeFeedLoading(with: [image])
+        XCTAssertEqual(sut.numberOfRenderedFeedImageViews, 1)
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #file, line: UInt = #line) -> (sut: FeedViewController, loader: LoaderSpy) {
@@ -58,6 +69,19 @@ final class FeedViewControllerTests: XCTestCase {
         trackMemoryLeaks(loader, file: file, line: line)
         trackMemoryLeaks(sut, file: file, line: line)
         return (sut, loader)
+    }
+    
+    private func makeImage(
+        description: String? = nil,
+        location: String? = nil,
+        url: URL = URL(string: "http://any-url.com")!
+    ) -> FeedImage {
+        FeedImage(
+            id: UUID(),
+            description: description,
+            location: location,
+            url: url
+        )
     }
     
     class LoaderSpy: FeedLoader {
@@ -70,8 +94,8 @@ final class FeedViewControllerTests: XCTestCase {
             completions.append(completion)
         }
         
-        func completeFeedLoading(at index: Int = 0) {
-            completions[index](.success([]))
+        func completeFeedLoading(with feed: [FeedImage] = [], at index: Int = 0) {
+            completions[index](.success(feed))
         }
     }
     

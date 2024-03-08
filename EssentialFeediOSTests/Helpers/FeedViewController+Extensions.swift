@@ -14,6 +14,10 @@ extension FeedViewController {
         refreshControl?.isRefreshing == true
     }
     
+    var numberOfRenderedFeedImageViews: Int {
+        tableView(tableView, numberOfRowsInSection: feedImageSection)
+    }
+    
     func simulateAppearance() {
         if !isViewLoaded {
             loadViewIfNeeded()
@@ -26,6 +30,8 @@ extension FeedViewController {
     func simulateUserInitiatedFeedReload() {
         refreshControl?.simulatePullToRefresh()
     }
+    
+    private var feedImageSection: Int { 0 }
     
     private func swapRefreshControlForIOS17Support() {
         let newRefreshControl = IOS17RefreshControlSpy()

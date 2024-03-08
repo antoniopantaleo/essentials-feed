@@ -12,6 +12,7 @@ public final class FeedViewController: UITableViewController {
     
     private var loader: FeedLoader?
     private var onViewIsAppearing: ((FeedViewController) -> Void)?
+    private var tableModel: [FeedImage] = []
     
     public convenience init(loader: FeedLoader) {
         self.init()
@@ -35,8 +36,15 @@ public final class FeedViewController: UITableViewController {
     
     @objc private func load() {
         refreshControl?.beginRefreshing()
-        loader?.load { [weak refreshControl] _ in
+        loader?.load { [weak self, refreshControl] feedResult in
+            if case let .success(feed) = feedResult {
+                self?.tableModel = feed
+            }
             refreshControl?.endRefreshing()
         }
+    }
+    
+    public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        tableModel.count
     }
 }
