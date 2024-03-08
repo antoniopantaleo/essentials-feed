@@ -27,6 +27,11 @@ extension FeedViewController {
         }
     }
     
+    func feedImageView(at index: Int) -> UITableViewCell? {
+        let indexPath = IndexPath(row: index, section: feedImageSection)
+        return tableView(tableView, cellForRowAt: indexPath)
+    }
+    
     func simulateUserInitiatedFeedReload() {
         refreshControl?.simulatePullToRefresh()
     }

@@ -47,4 +47,13 @@ public final class FeedViewController: UITableViewController {
     public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         tableModel.count
     }
+    
+    public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let model = tableModel[indexPath.row]
+        let cell = FeedImageCell()
+        cell.locationContainer.isHidden = model.location == nil
+        cell.descriptionLabel.text = model.description
+        cell.locationLabel.text = model.location
+        return cell
+    }
 }
