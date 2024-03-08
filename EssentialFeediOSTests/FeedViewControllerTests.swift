@@ -40,13 +40,13 @@ final class FeedViewControllerTests: XCTestCase {
         sut.simulateAppearance()
         XCTAssertTrue(sut.isShowingLoadingIndicator)
         
-        loader.completeFeedLoading()
+        loader.completeFeedLoading(at: 0)
         XCTAssertFalse(sut.isShowingLoadingIndicator)
         
         sut.simulateUserInitiatedFeedReload()
         XCTAssertTrue(sut.isShowingLoadingIndicator)
         
-        loader.completeFeedLoading()
+        loader.completeFeedLoading(at: 1)
         XCTAssertFalse(sut.isShowingLoadingIndicator)
     }
     
