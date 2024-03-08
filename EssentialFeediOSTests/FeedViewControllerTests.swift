@@ -46,7 +46,7 @@ final class FeedViewControllerTests: XCTestCase {
         sut.simulateUserInitiatedFeedReload()
         XCTAssertTrue(sut.isShowingLoadingIndicator)
         
-        loader.completeFeedLoading(at: 1)
+        loader.completeFeedLoadingWithError(at: 1)
         XCTAssertFalse(sut.isShowingLoadingIndicator)
     }
     
@@ -72,7 +72,7 @@ final class FeedViewControllerTests: XCTestCase {
         let image0 = makeImage()
         let (sut, loader) = makeSUT()
         
-        sut.simulateAppearance()
+        sut.simulateAppearance  ()
         loader.completeFeedLoading(with: [image0], at: 0)
         try assertThat(sut, isRendering: [image0])
         
