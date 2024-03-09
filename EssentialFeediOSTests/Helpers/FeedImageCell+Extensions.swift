@@ -15,4 +15,5 @@ extension FeedImageCell {
     var descriptionText: String? { descriptionLabel.text }
     var renderedImage: Data? { feedImageView.image?.pngData() }
     var isShowingRetryAction: Bool { !feedImageRetryButton.isHidden }
+    func simulateRetryAction() { feedImageRetryButton.simulateTap() }
 }
