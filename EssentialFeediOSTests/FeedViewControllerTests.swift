@@ -98,6 +98,23 @@ final class FeedViewControllerTests: XCTestCase {
         XCTAssertEqual(loader.loadedImageURLs, [image0.url, image1.url])
     }
     
+    func test_feedImageView_cancelsImageURLWhenNotVisibleAnymore() {
+        let image0 = makeImage(url: URL(string: "http://image0.com")!)
+        let image1 = makeImage(url: URL(string: "http://image1.com")!)
+        let (sut, loader) = makeSUT()
+        
+        sut.simulateAppearance()
+        
+        loader.completeFeedLoading(with: [image0, image1])
+        XCTAssertEqual(loader.cancelledImageURLs, [])
+        
+        sut.simulateViewNotVisible(at: 0)
+        XCTAssertEqual(loader.cancelledImageURLs, [image0.url])
+        
+        sut.simulateViewNotVisible(at: 1)
+        XCTAssertEqual(loader.cancelledImageURLs, [image0.url, image1.url])
+    }
+    
     // MARK: - Helpers
     
     private func makeSUT(file: StaticString = #file, line: UInt = #line) -> (sut: FeedViewController, loader: LoaderSpy) {
@@ -162,6 +179,7 @@ final class FeedViewControllerTests: XCTestCase {
         
         var loadCallCount: Int  { completions.count }
         private(set) var loadedImageURLs = [URL]()
+        private(set) var cancelledImageURLs = [URL]()
         
         func completeFeedLoadingWithError(at index: Int = 0) {
             let error = NSError(domain: "an error", code: 0)
@@ -178,6 +196,10 @@ final class FeedViewControllerTests: XCTestCase {
         
         func loadImageData(from url: URL) {
             loadedImageURLs.append(url)
+        }
+        
+        func cancelImageDataLoading(for url: URL) {
+            cancelledImageURLs.append(url)
         }
     }
     
