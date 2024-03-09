@@ -39,6 +39,11 @@ extension FeedViewController {
         delegate?.tableView?(tableView, didEndDisplaying: view!, forRowAt: indexPath)
     }
     
+    func simulateFeedImageViewNearVisible(at index: Int) {
+        let indexPath = IndexPath(row: index, section: feedImageSection)
+        tableView(tableView, prefetchRowsAt: [indexPath])
+    }
+    
     func feedImageView(at index: Int) -> UITableViewCell? {
         let indexPath = IndexPath(row: index, section: feedImageSection)
         return tableView(tableView, cellForRowAt: indexPath)
