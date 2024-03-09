@@ -27,6 +27,10 @@ extension FeedViewController {
         }
     }
     
+    func simulateViewVisible(at index: Int) {
+        _ = feedImageView(at: index)
+    }
+    
     func feedImageView(at index: Int) -> UITableViewCell? {
         let indexPath = IndexPath(row: index, section: feedImageSection)
         return tableView(tableView, cellForRowAt: indexPath)
