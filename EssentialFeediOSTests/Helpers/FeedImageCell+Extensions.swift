@@ -14,4 +14,5 @@ extension FeedImageCell {
     var locationText: String? { locationLabel.text }
     var descriptionText: String? { descriptionLabel.text }
     var renderedImage: Data? { feedImageView.image?.pngData() }
+    var isShowingRetryAction: Bool { !feedImageRetryButton.isHidden }
 }
