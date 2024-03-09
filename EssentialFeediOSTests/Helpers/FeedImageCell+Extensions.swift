@@ -10,6 +10,7 @@ import EssentialFeediOS
 
 extension FeedImageCell {
     var isShowingLocation: Bool { !locationContainer.isHidden }
+    var isShowingImageLoadingIndicator: Bool { feedImageContainer.isShimmering }
     var locationText: String? { locationLabel.text }
     var descriptionText: String? { descriptionLabel.text }
 }
