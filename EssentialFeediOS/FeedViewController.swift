@@ -73,7 +73,8 @@ public final class FeedViewController: UITableViewController {
             switch result {
                 case let .success(imageData):
                     cell.feedImageRetryButton.isHidden = !imageData.isEmpty
-                    cell.feedImageView.image = UIImage(data: imageData)
+                    guard let decodedImage = UIImage(data: imageData) else { fallthrough }
+                    cell.feedImageView.image = decodedImage
                 case .failure:
                     cell.feedImageRetryButton.isHidden = false
             }
