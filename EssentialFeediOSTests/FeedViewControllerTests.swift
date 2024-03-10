@@ -50,6 +50,17 @@ final class FeedViewControllerTests: XCTestCase {
         XCTAssertFalse(sut.isShowingLoadingIndicator)
     }
     
+    func test_loadFeed_runsAutomaticallyOnlyOnFirstAppearance() {
+        let (sut, loader) = makeSUT()
+        XCTAssertEqual(loader.loadCallCount, 0, "Expected no loading requests before view appears")
+        
+        sut.simulateAppearance()
+        XCTAssertEqual(loader.loadCallCount, 1, "Expected a loading request once view appears")
+        
+        sut.simulateAppearance()
+        XCTAssertEqual(loader.loadCallCount, 1, "Expected no loading request the second time view appears")
+    }
+    
     func test_loadFeedCompletion_rendersSuccesfullyLoadedFeed() throws {
         let image0 = makeImage(description: "a description", location: "a location")
         let image1 = makeImage(description: nil, location: "another location")

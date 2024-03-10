@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import EssentialFeediOS
+@testable import EssentialFeediOS
 
 extension FeedViewController {
     
@@ -22,9 +22,9 @@ extension FeedViewController {
         if !isViewLoaded {
             loadViewIfNeeded()
             swapRefreshControlForIOS17Support()
-            beginAppearanceTransition(true, animated: false)
-            endAppearanceTransition()
         }
+        beginAppearanceTransition(true, animated: false)
+        endAppearanceTransition()
     }
     
     @discardableResult
@@ -62,9 +62,11 @@ extension FeedViewController {
     private var feedImageSection: Int { 0 }
     
     private func swapRefreshControlForIOS17Support() {
-        let newRefreshControl = IOS17RefreshControlSpy()
-        newRefreshControl.setupActions(from: refreshControl)
-        refreshControl = newRefreshControl
+        let fakeRefreshControl = IOS17RefreshControlSpy()
+        fakeRefreshControl.setupActions(from: refreshControl)
+        fakeRefreshControl.setupActions(from: feedRefreshViewController?.view)
+        feedRefreshViewController?.view = fakeRefreshControl
+        refreshControl = fakeRefreshControl
     }
     
 }
