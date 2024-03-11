@@ -43,6 +43,7 @@ final class FeedImageCellController: FeedImageView {
     }
     
     func cancelLoad() {
+        cell = nil
         delegate.didCancelImageRequest()
     }
 }
