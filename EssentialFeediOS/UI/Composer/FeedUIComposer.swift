@@ -11,8 +11,9 @@ import UIKit
 
 public enum FeedUIComposer {
     public static func feedViewController(feedLoader: FeedLoader, imageLoader: FeedImageLoader) -> FeedViewController {
-        let feedPresenter = FeedPresenter(feedLoader: feedLoader)
-        let feedRefreshViewController = FeedRefreshViewController(loadFeed: feedPresenter.loadFeed)
+        let feedPresenter = FeedPresenter()
+        let feedLoaderPresentationAdapter = FeedLoaderPresentationAdapter(feedLoader: feedLoader, feedPresenter: feedPresenter)
+        let feedRefreshViewController = FeedRefreshViewController(loadFeed: feedLoaderPresentationAdapter.loadFeed)
         let feedViewController = FeedViewController(feedRefreshViewController: feedRefreshViewController)
         feedPresenter.feedLoadingView = WeakRefProxy(feedRefreshViewController)
         feedPresenter.feedView = FeedImageCellControllerAdapter(controller: feedViewController, imageLoader: imageLoader)
@@ -48,6 +49,28 @@ private final class FeedImageCellControllerAdapter: FeedView {
         controller?.tableModel = viewModel.feed.map { model in
             let viewModel = FeedImageViewModel<UIImage>(model: model, imageLoader: imageLoader, imageDecoder: UIImage.init(data:))
             return FeedImageCellController(viewModel: viewModel)
+        }
+    }
+}
+
+private final class FeedLoaderPresentationAdapter {
+    private let feedLoader: FeedLoader
+    private let feedPresenter : FeedPresenter
+    
+    init(feedLoader: FeedLoader, feedPresenter: FeedPresenter) {
+        self.feedLoader = feedLoader
+        self.feedPresenter = feedPresenter
+    }
+    
+    func loadFeed() {
+        feedPresenter.didStartLoadingFeed()
+        feedLoader.load { [weak feedPresenter] result in
+            switch result {
+                case let .success(feed):
+                    feedPresenter?.didFinishLoadingFeed(with: feed)
+                case let .failure(error):
+                    feedPresenter?.didFinishLoadingFeed(withError: error)
+            }
         }
     }
 }
