@@ -16,11 +16,6 @@ public final class FeedViewController: UITableViewController, UITableViewDataSou
         didSet { tableView.reloadData() }
     }
     
-    convenience init(feedRefreshViewController: FeedRefreshViewController) {
-        self.init()
-        self.feedRefreshViewController = feedRefreshViewController
-    }
-    
     public override func viewDidLoad() {
         super.viewDidLoad()
         refreshControl = feedRefreshViewController?.view
