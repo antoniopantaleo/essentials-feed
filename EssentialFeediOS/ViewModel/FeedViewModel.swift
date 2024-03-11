@@ -13,24 +13,20 @@ final class FeedViewModel {
     typealias Observer<T> = ((T) -> Void)
     
     private let feedLoader: FeedLoader
-    var onChange: Observer<FeedViewModel>?
+    var onLoadingChange: Observer<Bool>?
     var onFeedLoad: Observer<[FeedImage]>?
     
     init(feedLoader: FeedLoader) {
         self.feedLoader = feedLoader
     }
     
-    private(set) var isLoading: Bool = true {
-        didSet { onChange?(self) }
-    }
-    
     func loadFeed() {
-        isLoading = true
+        onLoadingChange?(true)
         feedLoader.load { [weak self] feedResult in
             if case let .success(feed) = feedResult {
                 self?.onFeedLoad?(feed)
             }
-            self?.isLoading = false
+            self?.onLoadingChange?(false)
         }
     }
 }
