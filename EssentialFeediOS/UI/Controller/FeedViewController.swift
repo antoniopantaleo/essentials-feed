@@ -18,7 +18,6 @@ public final class FeedViewController: UITableViewController, UITableViewDataSou
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.prefetchDataSource = self
         onViewIsAppearing = { viewController in
             viewController.refresh()
             viewController.onViewIsAppearing = nil
