@@ -56,8 +56,8 @@ final class FeedRefreshViewController: NSObject {
     private let viewModel: FeedViewModel
     var onRefresh: (([FeedImage]) -> Void)?
 
-    init(feedLoader: FeedLoader) {
-        viewModel = FeedViewModel(feedLoader: feedLoader)
+    init(viewModel: FeedViewModel) {
+        self.viewModel = viewModel
     }
     
     lazy var view: UIRefreshControl = {
