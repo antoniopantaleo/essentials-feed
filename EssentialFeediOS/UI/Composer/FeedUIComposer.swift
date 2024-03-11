@@ -22,7 +22,7 @@ public enum FeedUIComposer {
             feedLoadingView: WeakRefProxy(feedViewController),
             feedView: FeedImageCellControllerAdapter(
                 controller: feedViewController,
-                imageLoader: imageLoader
+                imageLoader: MainQueueDispatchDecorator(decoratee: imageLoader)
             )
         )
         return feedViewController
@@ -60,6 +60,14 @@ private final class MainQueueDispatchDecorator<T> {
 extension MainQueueDispatchDecorator: FeedLoader where T == FeedLoader {
     func load(completion: @escaping (LoadFeedResult) -> Void) {
         decoratee.load { [weak self] result in
+            self?.dispatch { completion(result) }
+        }
+    }
+}
+
+extension MainQueueDispatchDecorator: FeedImageLoader where T == FeedImageLoader {
+    func loadImageData(from url: URL, completion: @escaping (FeedImageLoader.Result) -> Void) -> FeedImageDataLoaderTask {
+        return decoratee.loadImageData(from: url) { [weak self] result in
             self?.dispatch { completion(result) }
         }
     }
