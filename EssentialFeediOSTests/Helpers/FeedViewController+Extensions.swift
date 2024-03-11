@@ -64,8 +64,6 @@ extension FeedViewController {
     private func swapRefreshControlForIOS17Support() {
         let fakeRefreshControl = IOS17RefreshControlSpy()
         fakeRefreshControl.setupActions(from: refreshControl)
-        fakeRefreshControl.setupActions(from: feedRefreshViewController?.view)
-        feedRefreshViewController?.view = fakeRefreshControl
         refreshControl = fakeRefreshControl
     }
     

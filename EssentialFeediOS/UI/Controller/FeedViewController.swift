@@ -8,9 +8,9 @@
 import UIKit
 import EssentialFeed
 
-public final class FeedViewController: UITableViewController, UITableViewDataSourcePrefetching {
+public final class FeedViewController: UITableViewController, UITableViewDataSourcePrefetching, FeedLoadingView {
     
-    @IBOutlet weak var feedRefreshViewController: FeedRefreshViewController!
+    var loadFeed: (() -> Void)?
     private var onViewIsAppearing: ((FeedViewController) -> Void)?
     var tableModel: [FeedImageCellController] = [] {
         didSet { tableView.reloadData() }
@@ -19,8 +19,8 @@ public final class FeedViewController: UITableViewController, UITableViewDataSou
     public override func viewDidLoad() {
         super.viewDidLoad()
         tableView.prefetchDataSource = self
-        onViewIsAppearing = { [weak feedRefreshViewController] viewController in
-            feedRefreshViewController?.refresh()
+        onViewIsAppearing = { viewController in
+            viewController.refresh()
             viewController.onViewIsAppearing = nil
         }
     }
@@ -28,6 +28,15 @@ public final class FeedViewController: UITableViewController, UITableViewDataSou
     public override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
         onViewIsAppearing?(self)
+    }
+    
+    @IBAction
+    private func refresh() {
+        loadFeed?()
+    }
+    
+    func display(_ viewModel: FeedLoadingViewModel) {
+        viewModel.isLoading ? refreshControl?.beginRefreshing() : refreshControl?.endRefreshing()
     }
     
     public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
