@@ -7,6 +7,7 @@
 
 import Foundation
 import EssentialFeed
+import UIKit
 
 public enum FeedUIComposer {
     public static func feedViewController(feedLoader: FeedLoader, imageLoader: FeedImageLoader) -> FeedViewController {
@@ -23,7 +24,7 @@ public enum FeedUIComposer {
 private enum FeedImageCellControllerAdapter {
     static func adapt(feed: [FeedImage], imageLoader: FeedImageLoader) -> [FeedImageCellController] {
         feed.map { model in
-            let viewModel = FeedImageViewModel(model: model, imageLoader: imageLoader)
+            let viewModel = FeedImageViewModel<UIImage>(model: model, imageLoader: imageLoader, imageDecoder: UIImage.init(data:))
             return FeedImageCellController(viewModel: viewModel)
         }
     }
