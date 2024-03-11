@@ -12,11 +12,10 @@ import UIKit
 public enum FeedUIComposer {
     public static func feedViewController(feedLoader: FeedLoader, imageLoader: FeedImageLoader) -> FeedViewController {
         let feedLoaderPresentationAdapter = FeedLoaderPresentationAdapter(feedLoader: feedLoader)
-        let bundle = Bundle(for: FeedViewController.self)
-        let storyboard = UIStoryboard(name: "Feed", bundle: bundle)
-        let feedViewController = storyboard.instantiateInitialViewController() as! FeedViewController
-        feedViewController.title = FeedPresenter.title
-        feedViewController.loadFeed = feedLoaderPresentationAdapter.loadFeed
+        let feedViewController = FeedViewController.makeWith(
+            loadFeed: feedLoaderPresentationAdapter.loadFeed,
+            title: FeedPresenter.title
+        )
         feedLoaderPresentationAdapter.feedPresenter = FeedPresenter(
             feedLoadingView: WeakRefProxy(feedViewController),
             feedView: FeedImageCellControllerAdapter(
@@ -25,6 +24,17 @@ public enum FeedUIComposer {
             )
         )
         return feedViewController
+    }
+}
+
+private extension FeedViewController {
+    static func makeWith(loadFeed: @escaping () -> Void, title: String) -> FeedViewController {
+        let bundle = Bundle(for: FeedViewController.self)
+        let storyboard = UIStoryboard(name: "Feed", bundle: bundle)
+        let feedController = storyboard.instantiateInitialViewController() as! FeedViewController
+        feedController.loadFeed = loadFeed
+        feedController.title = title
+        return feedController
     }
 }
 
