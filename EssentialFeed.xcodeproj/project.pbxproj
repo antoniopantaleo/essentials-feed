@@ -36,6 +36,7 @@
 		A96B27A42B9F985A000E46DF /* FeedImagePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96B27A32B9F985A000E46DF /* FeedImagePresenter.swift */; };
 		A96B27A82B9F9CA8000E46DF /* FeedPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96B27A72B9F9CA8000E46DF /* FeedPresenter.swift */; };
 		A96B27AD2B9FB4D2000E46DF /* Feed.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A96B27AC2B9FB4D2000E46DF /* Feed.storyboard */; };
+		A96B27B02B9FC007000E46DF /* Feed.strings in Resources */ = {isa = PBXBuildFile; fileRef = A96B27AE2B9FC007000E46DF /* Feed.strings */; };
 		A96CF5382A90C008004E2640 /* FeedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96CF5372A90C008004E2640 /* FeedImage.swift */; };
 		A96CF53A2A90C086004E2640 /* FeedLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A96CF5392A90C086004E2640 /* FeedLoader.swift */; };
 		A97CC6AA2B967F960084CFB3 /* FeedViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A97CC6A92B967F960084CFB3 /* FeedViewController+Extensions.swift */; };
@@ -148,6 +149,8 @@
 		A96B27A32B9F985A000E46DF /* FeedImagePresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedImagePresenter.swift; sourceTree = "<group>"; };
 		A96B27A72B9F9CA8000E46DF /* FeedPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedPresenter.swift; sourceTree = "<group>"; };
 		A96B27AC2B9FB4D2000E46DF /* Feed.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Feed.storyboard; sourceTree = "<group>"; };
+		A96B27AF2B9FC007000E46DF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Feed.strings; sourceTree = "<group>"; };
+		A96B27B12B9FC051000E46DF /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Feed.strings; sourceTree = "<group>"; };
 		A96CF52C2A90BF6E004E2640 /* EssentialFeed.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = EssentialFeed.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A96CF5372A90C008004E2640 /* FeedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedImage.swift; sourceTree = "<group>"; };
 		A96CF5392A90C086004E2640 /* FeedLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedLoader.swift; sourceTree = "<group>"; };
@@ -348,6 +351,7 @@
 			children = (
 				A96B27A32B9F985A000E46DF /* FeedImagePresenter.swift */,
 				A96B27A72B9F9CA8000E46DF /* FeedPresenter.swift */,
+				A96B27AE2B9FC007000E46DF /* Feed.strings */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";
@@ -649,6 +653,7 @@
 			knownRegions = (
 				en,
 				Base,
+				it,
 			);
 			mainGroup = A96CF5222A90BF6E004E2640;
 			productRefGroup = A96CF52D2A90BF6E004E2640 /* Products */;
@@ -677,6 +682,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A96B27B02B9FC007000E46DF /* Feed.strings in Resources */,
 				A96B27AD2B9FB4D2000E46DF /* Feed.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -833,6 +839,18 @@
 			targetProxy = A9FD7F9B2B9E0ADD00120EA8 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		A96B27AE2B9FC007000E46DF /* Feed.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A96B27AF2B9FC007000E46DF /* en */,
+				A96B27B12B9FC051000E46DF /* it */,
+			);
+			name = Feed.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		074540FF2A9B9074001F4A43 /* Debug */ = {
@@ -998,6 +1016,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -1066,6 +1085,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
