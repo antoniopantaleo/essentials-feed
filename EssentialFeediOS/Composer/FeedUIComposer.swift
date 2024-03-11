@@ -13,10 +13,16 @@ public enum FeedUIComposer {
         let feedRefreshViewController = FeedRefreshViewController(feedLoader: feedLoader)
         let feedViewController = FeedViewController(feedRefreshViewController: feedRefreshViewController)
         feedRefreshViewController.onRefresh = { [weak feedViewController] feed in
-            feedViewController?.tableModel = feed.map { model in
-                FeedImageCellController(model: model, imageLoader: imageLoader)
-            }
+            feedViewController?.tableModel = FeedImageCellControllerAdapter.adapt(feed: feed, imageLoader: imageLoader)
         }
         return feedViewController
+    }
+}
+
+private enum FeedImageCellControllerAdapter {
+    static func adapt(feed: [FeedImage], imageLoader: FeedImageLoader) -> [FeedImageCellController] {
+        feed.map { model in
+            FeedImageCellController(model: model, imageLoader: imageLoader)
+        }
     }
 }
