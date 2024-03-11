@@ -10,7 +10,7 @@ import EssentialFeed
 
 public final class FeedViewController: UITableViewController, UITableViewDataSourcePrefetching {
     
-    var feedRefreshViewController: FeedRefreshViewController?
+    @IBOutlet weak var feedRefreshViewController: FeedRefreshViewController!
     private var onViewIsAppearing: ((FeedViewController) -> Void)?
     var tableModel: [FeedImageCellController] = [] {
         didSet { tableView.reloadData() }
@@ -18,7 +18,6 @@ public final class FeedViewController: UITableViewController, UITableViewDataSou
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        refreshControl = feedRefreshViewController?.view
         tableView.prefetchDataSource = self
         onViewIsAppearing = { [weak feedRefreshViewController] viewController in
             feedRefreshViewController?.refresh()
