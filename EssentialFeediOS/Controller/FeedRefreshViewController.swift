@@ -14,39 +14,23 @@ final class FeedViewModel {
     
     private let feedLoader: FeedLoader
     var onChange: Observer<FeedViewModel>?
+    var onFeedLoad: Observer<[FeedImage]>?
     
     init(feedLoader: FeedLoader) {
         self.feedLoader = feedLoader
     }
     
-    private enum State {
-        case pending
-        case loading
-        case loaded([FeedImage])
-        case failed
-    }
-    
-    private var state = State.pending {
+    private(set) var isLoading: Bool = true {
         didSet { onChange?(self) }
     }
     
-    var isLoading: Bool {
-        guard case .loading = state else { return false }
-        return true
-    }
-    var feed: [FeedImage]? {
-        guard case let .loaded(feed) = state else { return nil }
-        return feed
-    }
-    
     func loadFeed() {
-        state = .loading
+        isLoading = true
         feedLoader.load { [weak self] feedResult in
             if case let .success(feed) = feedResult {
-                self?.state = .loaded(feed)
-            } else {
-                self?.state = .failed
+                self?.onFeedLoad?(feed)
             }
+            self?.isLoading = false
         }
     }
 }
@@ -54,7 +38,6 @@ final class FeedViewModel {
 final class FeedRefreshViewController: NSObject {
     
     private let viewModel: FeedViewModel
-    var onRefresh: (([FeedImage]) -> Void)?
 
     init(viewModel: FeedViewModel) {
         self.viewModel = viewModel
@@ -62,17 +45,13 @@ final class FeedRefreshViewController: NSObject {
     
     lazy var view: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
-        
         refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
         return refreshControl
     }()
     
     @objc func refresh() {
-        viewModel.onChange = { [weak self, weak view] viewModel in
+        viewModel.onChange = { [weak view] viewModel in
             viewModel.isLoading ? view?.beginRefreshing() : view?.endRefreshing()
-            if let feed = viewModel.feed {
-                self?.onRefresh?(feed)
-            }
         }
         viewModel.loadFeed()
     }
