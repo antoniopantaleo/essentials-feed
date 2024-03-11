@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import EssentialFeediOS
+@testable import EssentialFeediOS
 
 extension FeedImageCell {
     var isShowingLocation: Bool { !locationContainer.isHidden }
