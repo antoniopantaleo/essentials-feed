@@ -12,7 +12,7 @@ import UIKit
 public enum FeedUIComposer {
     public static func feedViewController(feedLoader: FeedLoader, imageLoader: FeedImageLoader) -> FeedViewController {
         let feedPresenter = FeedPresenter(feedLoader: feedLoader)
-        let feedRefreshViewController = FeedRefreshViewController(feedPresenter: feedPresenter)
+        let feedRefreshViewController = FeedRefreshViewController(loadFeed: feedPresenter.loadFeed)
         let feedViewController = FeedViewController(feedRefreshViewController: feedRefreshViewController)
         feedPresenter.feedLoadingView = WeakRefProxy(feedRefreshViewController)
         feedPresenter.feedView = FeedImageCellControllerAdapter(controller: feedViewController, imageLoader: imageLoader)
