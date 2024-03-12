@@ -9,13 +9,20 @@ import UIKit
 import EssentialFeed
 
 final class ErrorView: UIView {
-    var message: String?
+    @IBOutlet private var messageLabel: UILabel!
+    
+    var message: String? {
+        didSet {
+            messageLabel.text = message
+        }
+    }
 }
 
 public final class FeedViewController: UITableViewController, UITableViewDataSourcePrefetching, FeedLoadingView, FeedErrorView {
     
     var loadFeed: (() -> Void)?
-    private(set) var errorView = ErrorView()
+    
+    @IBOutlet var errorView: ErrorView?
     private var onViewIsAppearing: ((FeedViewController) -> Void)?
     var tableModel: [FeedImageCellController] = [] {
         didSet { tableView.reloadData() }
@@ -47,7 +54,7 @@ public final class FeedViewController: UITableViewController, UITableViewDataSou
     }
     
     func display(_ viewModel: FeedErrorViewModel) {
-        errorView.message = viewModel.message
+        errorView?.message = viewModel.message
     }
     
     public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
