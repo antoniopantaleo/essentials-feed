@@ -23,7 +23,8 @@ public enum FeedUIComposer {
             feedView: FeedImageCellControllerAdapter(
                 controller: feedViewController,
                 imageLoader: MainQueueDispatchDecorator(decoratee: imageLoader)
-            )
+            ),
+            feedErrorView: WeakRefProxy(feedViewController)
         )
         return feedViewController
     }
@@ -89,6 +90,12 @@ extension WeakRefProxy: FeedLoadingView where T: FeedLoadingView {
 
 extension WeakRefProxy: FeedImageView where T: FeedImageView, T.Image == UIImage {
     func display(_ viewModel: FeedImageViewModel<UIImage>) {
+        instance?.display(viewModel)
+    }
+}
+
+extension WeakRefProxy: FeedErrorView where T: FeedErrorView {
+    func display(_ viewModel: FeedErrorViewModel) {
         instance?.display(viewModel)
     }
 }

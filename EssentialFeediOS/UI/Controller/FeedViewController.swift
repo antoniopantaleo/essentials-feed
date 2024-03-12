@@ -12,7 +12,7 @@ final class ErrorView: UIView {
     var message: String?
 }
 
-public final class FeedViewController: UITableViewController, UITableViewDataSourcePrefetching, FeedLoadingView {
+public final class FeedViewController: UITableViewController, UITableViewDataSourcePrefetching, FeedLoadingView, FeedErrorView {
     
     var loadFeed: (() -> Void)?
     private(set) var errorView = ErrorView()
@@ -44,6 +44,10 @@ public final class FeedViewController: UITableViewController, UITableViewDataSou
             return DispatchQueue.main.async { [weak self] in self?.display(viewModel) }
         }
         viewModel.isLoading ? refreshControl?.beginRefreshing() : refreshControl?.endRefreshing()
+    }
+    
+    func display(_ viewModel: FeedErrorViewModel) {
+        errorView.message = viewModel.message
     }
     
     public override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
