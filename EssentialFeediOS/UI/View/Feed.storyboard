@@ -21,6 +21,7 @@
                             <subviews>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wkz-eF-91C">
                                     <rect key="frame" x="8" y="8" width="398" height="29"/>
+                                    <gestureRecognizers/>
                                     <string key="text">This is an
 error view</string>
                                     <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
@@ -29,6 +30,7 @@ error view</string>
                                 </label>
                             </subviews>
                             <color key="backgroundColor" systemColor="systemRedColor"/>
+                            <gestureRecognizers/>
                             <constraints>
                                 <constraint firstItem="Wkz-eF-91C" firstAttribute="leading" secondItem="clu-9B-M8g" secondAttribute="leading" constant="8" id="5GR-li-bO5"/>
                                 <constraint firstAttribute="trailing" secondItem="Wkz-eF-91C" secondAttribute="trailing" constant="8" id="hjS-3H-aG9"/>
@@ -36,7 +38,7 @@ error view</string>
                                 <constraint firstItem="Wkz-eF-91C" firstAttribute="top" secondItem="clu-9B-M8g" secondAttribute="top" constant="8" id="rzb-Ik-aN3"/>
                             </constraints>
                             <connections>
-                                <outlet property="messageLabel" destination="Wkz-eF-91C" id="7jD-FO-9Ct"/>
+                                <outlet property="messageLabel" destination="Wkz-eF-91C" id="IhV-L6-I2r"/>
                             </connections>
                         </view>
                         <view key="tableFooterView" contentMode="scaleToFill" id="pGT-Qn-vv2">

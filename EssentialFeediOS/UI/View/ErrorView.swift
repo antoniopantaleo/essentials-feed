@@ -9,6 +9,10 @@ import UIKit
 
 final class ErrorView: UIView {
     @IBOutlet private var messageLabel: UILabel!
+    private lazy var gestureRecognizer: UITapGestureRecognizer = {
+        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(hideMessageAnimated))
+        return gestureRecognizer
+    }()
     
     var message: String? {
         get { isVisible ? messageLabel.text : nil }
@@ -18,6 +22,7 @@ final class ErrorView: UIView {
     override func awakeFromNib() {
         super.awakeFromNib()
         alpha = 0
+        self.addGestureRecognizer(gestureRecognizer)
     }
     
     private var isVisible: Bool {
@@ -39,6 +44,7 @@ final class ErrorView: UIView {
         }
     }
     
+    @objc
     private func hideMessageAnimated() {
         UIView.animate(
             withDuration: 0.25,

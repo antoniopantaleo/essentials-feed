@@ -22,6 +22,11 @@ extension FeedViewController {
         errorView?.message
     }
     
+    func simulateTapOnErrorView() throws {
+        guard errorView?.isHidden == false else { throw NSError(domain: "No view", code: 0) }
+        errorView?.gestureRecognizers?.forEach { $0.sendActions() }
+    }
+    
     func simulateAppearance() {
         if !isViewLoaded {
             loadViewIfNeeded()
@@ -118,4 +123,38 @@ fileprivate extension UIRefreshControl {
             }
         }
     }
+}
+
+fileprivate extension  UIGestureRecognizer {
+    
+    typealias TargetActionInfo = [(target: AnyObject, action: Selector)]
+    
+    private func getTargetInfo() -> TargetActionInfo {
+        guard let targets = value(forKeyPath: "_targets") as? [NSObject] else {
+            return []
+        }
+        var targetsInfo: TargetActionInfo = []
+        for target in targets {
+            let description = String(describing: target).trimmingCharacters(in: CharacterSet(charactersIn: "()"))
+            var selectorString = description.components(separatedBy: ", ").first ?? ""
+            selectorString = selectorString.components(separatedBy: "=").last ?? ""
+            let selector = NSSelectorFromString(selectorString)
+            
+            if let targetActionPairClass = NSClassFromString("UIGestureRecognizerTarget"),
+               let targetIvar = class_getInstanceVariable(targetActionPairClass, "_target"),
+               let targetObject = object_getIvar(target, targetIvar) {
+                targetsInfo.append((target: targetObject as AnyObject, action: selector))
+            }
+        }
+        
+        return targetsInfo
+    }
+    
+    func sendActions() {
+        let targetsInfo = getTargetInfo()
+        for info in targetsInfo {
+            info.target.performSelector(onMainThread: info.action, with: self, waitUntilDone: true)
+        }
+    }
+    
 }
