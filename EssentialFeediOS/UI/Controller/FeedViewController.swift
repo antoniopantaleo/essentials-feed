@@ -18,15 +18,7 @@ public final class FeedViewController: UITableViewController, UITableViewDataSou
     private(set) var errorView = ErrorView()
     private var onViewIsAppearing: ((FeedViewController) -> Void)?
     var tableModel: [FeedImageCellController] = [] {
-        didSet {
-            if Thread.isMainThread {
-                tableView.reloadData()
-            } else {
-                DispatchQueue.main.async { [weak self] in
-                    self?.tableView.reloadData()
-                }
-            }
-        }
+        didSet { tableView.reloadData() }
     }
     
     public override func viewDidLoad() {
