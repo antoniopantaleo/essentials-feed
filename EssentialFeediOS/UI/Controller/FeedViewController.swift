@@ -8,16 +8,6 @@
 import UIKit
 import EssentialFeed
 
-final class ErrorView: UIView {
-    @IBOutlet private var messageLabel: UILabel!
-    
-    var message: String? {
-        didSet {
-            messageLabel.text = message
-        }
-    }
-}
-
 public final class FeedViewController: UITableViewController, UITableViewDataSourcePrefetching, FeedLoadingView, FeedErrorView {
     
     var loadFeed: (() -> Void)?
