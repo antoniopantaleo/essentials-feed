@@ -308,9 +308,13 @@ final class FeedViewControllerTests: XCTestCase {
         let (sut, loader) = makeSUT()
         sut.simulateAppearance()
         XCTAssertEqual(sut.errorMessage, nil)
+        
         loader.completeFeedLoadingWithError()
         let bundle = Bundle(for: FeedPresenter.self)
         XCTAssertEqual(sut.errorMessage, localized(bundle: bundle, "FEED_VIEW_CONNECTION_ERROR"))
+        
+        sut.simulateUserInitiatedFeedReload()
+        XCTAssertEqual(sut.errorMessage, nil)
     }
     
     // MARK: - Helpers
