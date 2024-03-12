@@ -8,9 +8,14 @@
 import UIKit
 import EssentialFeed
 
+final class ErrorView: UIView {
+    var message: String?
+}
+
 public final class FeedViewController: UITableViewController, UITableViewDataSourcePrefetching, FeedLoadingView {
     
     var loadFeed: (() -> Void)?
+    private(set) var errorView = ErrorView()
     private var onViewIsAppearing: ((FeedViewController) -> Void)?
     var tableModel: [FeedImageCellController] = [] {
         didSet {

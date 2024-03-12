@@ -18,6 +18,10 @@ extension FeedViewController {
         tableView(tableView, numberOfRowsInSection: feedImageSection)
     }
     
+    var errorMessage: String? {
+        errorView.message
+    }
+    
     func simulateAppearance() {
         if !isViewLoaded {
             loadViewIfNeeded()
