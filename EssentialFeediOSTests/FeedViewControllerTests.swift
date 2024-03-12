@@ -304,10 +304,13 @@ final class FeedViewControllerTests: XCTestCase {
         wait(for: [exp], timeout: 1.0)
     }
     
-    func test_errorView_doesNotRenderErrorOnLoad() {
-        let (sut, _) = makeSUT()
+    func test_errorView_rendersErrorOnLoadError() {
+        let (sut, loader) = makeSUT()
         sut.simulateAppearance()
         XCTAssertEqual(sut.errorMessage, nil)
+        loader.completeFeedLoadingWithError()
+        let bundle = Bundle(for: FeedPresenter.self)
+        XCTAssertEqual(sut.errorMessage, localized(bundle: bundle, "FEED_VIEW_CONNECTION_ERROR"))
     }
     
     // MARK: - Helpers
