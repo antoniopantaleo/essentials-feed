@@ -97,14 +97,14 @@ final class RemoteFeedImageLoaderTests: XCTestCase {
         })
     }
     
-        func test_loadImageDataFromURL_deliversReceivedNonEmptyDataOn200HTTPResponse() {
-            let (sut, client) = makeSUT()
-            let nonEmptyData = Data("non-empty data".utf8)
-            
-            expect(sut, toCompleteWith: .success(nonEmptyData), when: {
-                client.complete(withStatusCode: 200, data: nonEmptyData)
-            })
-        }
+    func test_loadImageDataFromURL_deliversReceivedNonEmptyDataOn200HTTPResponse() {
+        let (sut, client) = makeSUT()
+        let nonEmptyData = Data("non-empty data".utf8)
+        
+        expect(sut, toCompleteWith: .success(nonEmptyData), when: {
+            client.complete(withStatusCode: 200, data: nonEmptyData)
+        })
+    }
     
     func test_loadImageDataFromURL_doesNotDeliverResultAfterSUTInstanceHasBeenDeallocated() {
         let client = HTTPClientSpy()
@@ -133,8 +133,8 @@ final class RemoteFeedImageLoaderTests: XCTestCase {
     }
     
     private func failure(_ error: RemoteFeedImageLoader.Error) -> FeedImageLoader.Result {
-            return .failure(error)
-        }
+        return .failure(error)
+    }
     
     private func expect(
         _ sut: RemoteFeedImageLoader,
@@ -162,7 +162,7 @@ final class RemoteFeedImageLoaderTests: XCTestCase {
         action()
         wait(for: [exp], timeout: 1.0)
     }
-
+    
     private class HTTPClientSpy: HTTPClient {
         private var messages = [(url: URL, completion: (HTTPClientResult) -> Void)]()
         var requestedURLs: [URL] {
