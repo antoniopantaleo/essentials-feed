@@ -90,7 +90,8 @@ final class RemoteFeedImageLoaderTests: XCTestCase {
             client.complete(withStatusCode: 200, data: emptyData)
         })
     }
-
+    
+    //MARK: - Helpers
     private func makeSUT(
         url: URL = anyURL,
         file: StaticString = #file,
