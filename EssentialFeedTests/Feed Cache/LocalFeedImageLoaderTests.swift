@@ -8,11 +8,15 @@
 import XCTest
 import EssentialFeed
 
+protocol FeedImageDataStore {
+    func retrieve(dataForURL url: URL)
+}
+
 class LocalFeedImageLoader: FeedImageLoader {
     
-    private let store: FeedStore
+    private let store: FeedImageDataStore
     
-    init(store: FeedStore) {
+    init(store: FeedImageDataStore) {
         self.store = store
     }
     
@@ -21,6 +25,7 @@ class LocalFeedImageLoader: FeedImageLoader {
     }
     
     func loadImageData(from url: URL, completion: @escaping (FeedImageLoader.Result) -> Void) -> FeedImageDataLoaderTask {
+        store.retrieve(dataForURL: url)
         return Task()
     }
     
@@ -30,8 +35,15 @@ class LocalFeedImageLoader: FeedImageLoader {
 final class LocalFeedImageLoaderTests: XCTestCase {
     
     func test_init_doesNotMessageStoreUponCreation() {
-        let (_, store) = makeSUT()        
+        let (_, store) = makeSUT()
         XCTAssertTrue(store.receivedMessages.isEmpty)
+    }
+    
+    func test_loadImageDataFromURL_requestsStoredDataForURL() {
+        let (sut, store) = makeSUT()
+        let url = anyURL
+        _ = sut.loadImageData(from: url) { _ in }
+        XCTAssertEqual(store.receivedMessages, [.retrieve(dataFor: url)])
     }
 
  
@@ -49,15 +61,17 @@ final class LocalFeedImageLoaderTests: XCTestCase {
         return (sut, store)
     }
     
-    private class FeedStoreSpy: FeedStore {
+    private class FeedStoreSpy: FeedImageDataStore {
         
-        let receivedMessages = [Any]()
+        enum Message: Equatable {
+            case retrieve(dataFor: URL)
+        }
         
-        func deleteCachedFeed(completion: @escaping DeletionCompletion) {}
+        private(set) var receivedMessages = [Message]()
         
-        func insert(_ feed: [EssentialFeed.LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {}
-        
-        func retrieve(completion: @escaping RetrievalCompletion) {}
+        func retrieve(dataForURL url: URL) {
+            receivedMessages.append(.retrieve(dataFor: url))
+        }
     }
     
 }
