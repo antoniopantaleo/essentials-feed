@@ -1,5 +1,5 @@
 //
-//  CoreDataFeedImageDataStoreTests.swift
+//  CoreDataFeedImageStoreTests.swift
 //  EssentialFeedTests
 //
 //  Created by Antonio Pantaleo on 16/03/24.
@@ -29,7 +29,7 @@ extension CoreDataFeedStore: FeedImageDataStore {
 
 }
 
-class CoreDataFeedImageDataStoreTests: XCTestCase {
+class CoreDataFeedImageStoreTests: XCTestCase {
 
     func test_retrieveImageData_deliversNotFoundWhenEmpty() {
         let sut = makeSUT()
