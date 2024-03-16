@@ -18,6 +18,11 @@ public class CoreDataFeedStore: FeedStore {
         context = container.newBackgroundContext()
     }
     
+    func perform(_ action: @escaping (NSManagedObjectContext) -> Void) {
+        let context = self.context
+        context.perform { action(context) }
+    }
+    
     public func retrieve(completion: @escaping RetrievalCompletion) {
         let context = self.context
         context.perform {

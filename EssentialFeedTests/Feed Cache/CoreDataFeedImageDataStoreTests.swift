@@ -6,16 +6,25 @@
 //
 
 import XCTest
-import EssentialFeed
+@testable import EssentialFeed
 
 extension CoreDataFeedStore: FeedImageDataStore {
 
     public func insert(_ data: Data, for url: URL, completion: @escaping (FeedImageDataStore.InsertionResult) -> Void) {
-
+        perform { context in
+            guard let image = try? ManagedFeedImage.first(with: url, in: context) else { return }
+            
+            image.data = data
+            try? context.save()
+        }
     }
 
     public func retrieve(dataForURL url: URL, completion: @escaping (FeedImageDataStore.RetrievalResult) -> Void) {
-        completion(.success(.none))
+        perform { context in
+            completion(Result {
+                return try ManagedFeedImage.first(with: url, in: context)?.data
+            })
+        }
     }
 
 }
@@ -36,6 +45,17 @@ class CoreDataFeedImageDataStoreTests: XCTestCase {
         
         expect(sut, toCompleteRetrievalWith: notFound(), for: nonMatchingURL)
     }
+    
+    func test_retrieveImageData_deliversFoundDataWhenThereIsAStoredImageDataMatchingURL() {
+        let sut = makeSUT()
+        let storedData = Data("any data".utf8)
+        let matchingURL = URL(string: "http://a-url.com")!
+        
+        insert(storedData, for: matchingURL, into: sut)
+        
+        expect(sut, toCompleteRetrievalWith: found(storedData), for: matchingURL)
+    }
+    
 
     //MARK: - Helpers
     
@@ -45,6 +65,10 @@ class CoreDataFeedImageDataStoreTests: XCTestCase {
         let sut = try! CoreDataFeedStore(storeURL: storeURL, bundle: storeBundle)
         trackMemoryLeaks(sut, file: file, line: line)
         return sut
+    }
+    
+    private func found(_ data: Data) -> FeedImageDataStore.RetrievalResult {
+        return .success(data)
     }
 
     private func notFound() -> FeedImageDataStore.RetrievalResult {
