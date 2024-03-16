@@ -20,8 +20,8 @@ public class RemoteFeedImageLoader: FeedImageLoader {
         let task = client.get(from: url) { [weak self] result in
             guard self != nil else { return }
             switch result {
-            case let .failure(error):
-                completion(.failure(error))
+            case .failure:
+                completion(.failure(Error.connectivity))
             case let .success((data, response)):
                 if response.statusCode == 200, !data.isEmpty {
                     completion(.success(data))
@@ -36,6 +36,7 @@ public class RemoteFeedImageLoader: FeedImageLoader {
 
 extension RemoteFeedImageLoader {
     public enum Error: Swift.Error {
+        case connectivity
         case invalidData
     }
     
