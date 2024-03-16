@@ -95,6 +95,14 @@ final class LocalFeedImageLoaderTests: XCTestCase {
             store.completeInsertion(with: insertionError)
         })
     }
+    
+    func test_saveImageDataFromURL_succeedsOnSuccessfulStoreInsertion() {
+        let (sut, store) = makeSUT()
+        
+        expect(sut, toCompleteWith: .success(()), when: {
+            store.completeInsertionSuccessfully()
+        })
+    }
  
     // MARK: - Helpers
     
@@ -211,6 +219,10 @@ final class LocalFeedImageLoaderTests: XCTestCase {
         
         func completeInsertion(with error: Error, at index: Int = 0) {
             insertionCompletions[index](.failure(error))
+        }
+        
+        func completeInsertionSuccessfully(at index: Int = 0) {
+            insertionCompletions[index](.success(()))
         }
     }
     
