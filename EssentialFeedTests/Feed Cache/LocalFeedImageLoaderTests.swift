@@ -48,7 +48,8 @@ class LocalFeedImageLoader: FeedImageLoader {
     
     func loadImageData(from url: URL, completion: @escaping (FeedImageLoader.Result) -> Void) -> FeedImageDataLoaderTask {
         let task = Task(completion)
-        store.retrieve(dataForURL: url) { result in
+        store.retrieve(dataForURL: url) { [weak self] result in
+            guard self != nil else { return }
             task.complete(with:
                 result
                 .mapError { _ in Error.failed }
@@ -114,6 +115,20 @@ final class LocalFeedImageLoaderTests: XCTestCase {
         store.complete(with: anyNSError)
         
         XCTAssertTrue(received.isEmpty, "Expected no received results after cancelling task")
+    }
+    
+    func test_loadImageDataFromURL_doesNotDeliverResultAfterSUTInstanceHasBeenDeallocated() {
+        let store = FeedStoreSpy()
+        var sut: LocalFeedImageLoader? = LocalFeedImageLoader(store: store)
+        let foundData = Data("any data".utf8)
+        
+        var received = [FeedImageLoader.Result]()
+        _ = sut?.loadImageData(from: anyURL) { received.append($0) }
+        
+        sut = nil
+        store.complete(with: foundData)
+        
+        XCTAssertTrue(received.isEmpty, "Expected no received results after instance has been deallocated")
     }
 
  
