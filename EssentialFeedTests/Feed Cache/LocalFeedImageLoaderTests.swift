@@ -26,13 +26,30 @@ class LocalFeedImageLoader: FeedImageLoader {
         self.store = store
     }
     
-    struct Task: FeedImageDataLoaderTask {
-        func cancel() {}
+    private final class Task: FeedImageDataLoaderTask {
+        private var completion: ((FeedImageLoader.Result) -> Void)?
+        
+        init(_ completion: @escaping (FeedImageLoader.Result) -> Void) {
+            self.completion = completion
+        }
+        
+        func complete(with result: FeedImageLoader.Result) {
+            completion?(result)
+        }
+        
+        private func preventFurtherCompletions() {
+            completion = nil
+        }
+        
+        func cancel() {
+            preventFurtherCompletions()
+        }
     }
     
     func loadImageData(from url: URL, completion: @escaping (FeedImageLoader.Result) -> Void) -> FeedImageDataLoaderTask {
+        let task = Task(completion)
         store.retrieve(dataForURL: url) { result in
-            completion(
+            task.complete(with:
                 result
                 .mapError { _ in Error.failed }
                 .flatMap { data in
@@ -40,10 +57,8 @@ class LocalFeedImageLoader: FeedImageLoader {
                 }
             )
         }
-        return Task()
+        return task
     }
-    
-    
 }
 
 final class LocalFeedImageLoaderTests: XCTestCase {
@@ -84,6 +99,21 @@ final class LocalFeedImageLoaderTests: XCTestCase {
         expect(sut, toCompleteWith: .success(foundData), when: {
             store.complete(with: foundData)
         })
+    }
+    
+    func test_loadImageDataFromURL_doesNotDeliverResultAfterCancellingTask() {
+        let (sut, store) = makeSUT()
+        let foundData = Data("any data".utf8)
+        
+        var received = [FeedImageLoader.Result]()
+        let task = sut.loadImageData(from: anyURL) { received.append($0) }
+        task.cancel()
+        
+        store.complete(with: foundData)
+        store.complete(with: .none)
+        store.complete(with: anyNSError)
+        
+        XCTAssertTrue(received.isEmpty, "Expected no received results after cancelling task")
     }
 
  
