@@ -9,15 +9,24 @@ import Foundation
 
 public protocol FeedImageDataStore {
     typealias Result = Swift.Result<Data?, Error>
+    typealias InsertionResult = Swift.Result<Void, Error>
+
+    func insert(_ data: Data, for url: URL, completion: @escaping (InsertionResult) -> Void)
     func retrieve(dataForURL url: URL, completion: @escaping (Result) -> Void)
 }
 
 public class LocalFeedImageLoader: FeedImageLoader {
     
+    public typealias SaveResult = Result<Void, Swift.Error>
+    
     private let store: FeedImageDataStore
     
     public init(store: FeedImageDataStore) {
         self.store = store
+    }
+
+    public func save(_ data: Data, for url: URL, completion: @escaping (SaveResult) -> Void) {
+        store.insert(data, for: url) { _ in }
     }
     
     public func loadImageData(from url: URL, completion: @escaping (FeedImageLoader.Result) -> Void) -> FeedImageDataLoaderTask {
