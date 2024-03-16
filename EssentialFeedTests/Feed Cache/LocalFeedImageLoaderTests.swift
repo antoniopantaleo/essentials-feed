@@ -86,6 +86,15 @@ final class LocalFeedImageLoaderTests: XCTestCase {
         
         XCTAssertEqual(store.receivedMessages, [.insert(data: data, for: url)])
     }
+    
+    func test_saveImageDataFromURL_failsOnStoreInsertionError() {
+        let (sut, store) = makeSUT()
+        
+        expect(sut, toCompleteWith: saveFailed(), when: {
+            let insertionError = anyNSError
+            store.completeInsertion(with: insertionError)
+        })
+    }
  
     // MARK: - Helpers
     
@@ -102,11 +111,15 @@ final class LocalFeedImageLoaderTests: XCTestCase {
     }
     
     private func failed() -> FeedImageLoader.Result {
-        return .failure(LocalFeedImageLoader.Error.failed)
+        .failure(LocalFeedImageLoader.Error.failed)
+    }
+    
+    private func saveFailed() -> LocalFeedImageLoader.SaveResult {
+        .failure(LocalFeedImageLoader.SaveError.failed)
     }
     
     private func notFound() -> FeedImageLoader.Result {
-        return .failure(LocalFeedImageLoader.Error.notFound)
+        .failure(LocalFeedImageLoader.Error.notFound)
     }
     
     private func expect(
@@ -138,6 +151,34 @@ final class LocalFeedImageLoaderTests: XCTestCase {
         wait(for: [exp], timeout: 1.0)
     }
 
+    private func expect(
+        _ sut: LocalFeedImageLoader,
+        toCompleteWith expectedResult: LocalFeedImageLoader.SaveResult,
+        when action: () -> Void,
+        file: StaticString = #file,
+        line: UInt = #line
+    ) {
+        let exp = expectation(description: "Wait for load completion")
+        
+        sut.save(Data("any data".utf8), for: anyURL) { receivedResult in
+            switch (receivedResult, expectedResult) {
+            case (.success, .success):
+                break
+                
+            case (.failure(let receivedError as LocalFeedImageLoader.SaveError),
+                  .failure(let expectedError as LocalFeedImageLoader.SaveError)):
+                XCTAssertEqual(receivedError, expectedError, file: file, line: line)
+                
+            default:
+                XCTFail("Expected result \(expectedResult), got \(receivedResult) instead", file: file, line: line)
+            }
+            
+            exp.fulfill()
+        }
+        
+        action()
+        wait(for: [exp], timeout: 1.0)
+    }
     
     private class FeedStoreSpy: FeedImageDataStore {
         
@@ -148,9 +189,11 @@ final class LocalFeedImageLoaderTests: XCTestCase {
         
         private(set) var receivedMessages = [Message]()
         private var completions = [(FeedImageDataStore.RetrievalResult) -> Void]()
+        private var insertionCompletions = [(FeedImageDataStore.InsertionResult) -> Void]()
         
         func insert(_ data: Data, for url: URL, completion: @escaping (FeedImageDataStore.InsertionResult) -> Void) {
             receivedMessages.append(.insert(data: data, for: url))
+            insertionCompletions.append(completion)
         }
         
         func retrieve(dataForURL url: URL, completion: @escaping (FeedImageDataStore.RetrievalResult) -> Void) {
@@ -164,6 +207,10 @@ final class LocalFeedImageLoaderTests: XCTestCase {
         
         func complete(with data: Data?, at index: Int = 0) {
             completions[index](.success(data))
+        }
+        
+        func completeInsertion(with error: Error, at index: Int = 0) {
+            insertionCompletions[index](.failure(error))
         }
     }
     

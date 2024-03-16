@@ -26,7 +26,9 @@ public class LocalFeedImageLoader: FeedImageLoader {
     }
 
     public func save(_ data: Data, for url: URL, completion: @escaping (SaveResult) -> Void) {
-        store.insert(data, for: url) { _ in }
+        store.insert(data, for: url) { result in
+            completion(.failure(SaveError.failed))
+        }
     }
     
     public func loadImageData(from url: URL, completion: @escaping (FeedImageLoader.Result) -> Void) -> FeedImageDataLoaderTask {
@@ -50,6 +52,10 @@ extension LocalFeedImageLoader {
     public enum Error: Swift.Error {
         case failed
         case notFound
+    }
+
+    public enum SaveError: Swift.Error {
+        case failed
     }
     
     private final class Task: FeedImageDataLoaderTask {
