@@ -10,22 +10,27 @@ import EssentialFeed
 
 class RemoteFeedImageLoader: FeedImageLoader {
     
+    private struct HTTPTaskWrapper: FeedImageDataLoaderTask {
+        let wrapped: HTTPClientTask
+        
+        func cancel() {
+            wrapped.cancel()
+        }
+    }
+    
     enum Error: Swift.Error {
         case invalidData
     }
     
     private let client: HTTPClient
     
-    struct Task: FeedImageDataLoaderTask {
-        func cancel() {}
-    }
-    
     init(client: HTTPClient) {
         self.client = client
     }
     
+    @discardableResult
     func loadImageData(from url: URL, completion: @escaping (FeedImageLoader.Result) -> Void) -> FeedImageDataLoaderTask {
-        client.get(from: url) { [weak self] result in
+        let task = client.get(from: url) { [weak self] result in
             guard self != nil else { return }
             switch result {
             case let .failure(error):
@@ -38,7 +43,7 @@ class RemoteFeedImageLoader: FeedImageLoader {
                 }
             }
         }
-        return Task()
+        return HTTPTaskWrapper(wrapped: task)
     }
     
     
@@ -163,17 +168,46 @@ final class RemoteFeedImageLoaderTests: XCTestCase {
         wait(for: [exp], timeout: 1.0)
     }
     
+    func test_cancelGetFromURLTask_cancelsURLRequest() {
+        let (sut, client) = makeSUT()
+        let exp = expectation(description: "Wait for request")
+        exp.isInverted = true
+        
+        let task = sut.loadImageData(from: anyURL) { result in
+            switch result {
+            case let .failure(error as NSError) where error.code == URLError.cancelled.rawValue:
+                break
+            default:
+                XCTFail("Expected cancelled result, got \(result) instead")
+            }
+            exp.fulfill()
+        }
+        task.cancel()
+        wait(for: [exp], timeout: 1.0)
+        XCTAssertEqual(client.cancelledURLs, [anyURL])
+    }
+    
     private class HTTPClientSpy: HTTPClient {
+        private struct Task: HTTPClientTask {
+            var onCancel: (() -> Void)?
+            
+            func cancel() {
+                onCancel?()
+            }
+        }
         private var messages = [(url: URL, completion: (HTTPClientResult) -> Void)]()
+        private(set) var cancelledURLs = [URL]()
         var requestedURLs: [URL] {
             messages.map { $0.url }
         }
         
-        func get(
-            from url: URL,
-            completion: @escaping (EssentialFeed.HTTPClientResult
-            ) -> Void) {
+        @discardableResult
+        func get(from url: URL, completion: @escaping (EssentialFeed.HTTPClientResult) -> Void) -> HTTPClientTask {
+            let task = Task { [weak self] in
+                self?.cancelledURLs.append(url)
+            }
             messages.append((url, completion))
+            return task
         }
         
         func complete(with error: Error, at index: Int = 0) {

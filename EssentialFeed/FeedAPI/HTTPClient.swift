@@ -9,7 +9,12 @@ import Foundation
 
 public typealias HTTPClientResult = Result<(Data, HTTPURLResponse), Error>
 
+public protocol HTTPClientTask {
+    func cancel()
+}
+
 /// Public because it can be implemented by external modules
 public protocol HTTPClient {
-    func get(from url: URL, completion: @escaping (HTTPClientResult) -> Void)
+    @discardableResult
+    func get(from url: URL, completion: @escaping (HTTPClientResult) -> Void) -> HTTPClientTask
 }
