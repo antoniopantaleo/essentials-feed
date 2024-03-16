@@ -64,7 +64,7 @@ final class LocalFeedImageLoaderTests: XCTestCase {
     }
     
     func test_loadImageDataFromURL_doesNotDeliverResultAfterSUTInstanceHasBeenDeallocated() {
-        let store = FeedStoreSpy()
+        let store = FeedImageStoreSpy()
         var sut: LocalFeedImageLoader? = LocalFeedImageLoader(store: store)
         let foundData = Data("any data".utf8)
         
@@ -103,6 +103,19 @@ final class LocalFeedImageLoaderTests: XCTestCase {
             store.completeInsertionSuccessfully()
         })
     }
+    
+    func test_saveImageDataFromURL_doesNotDeliverResultAfterSUTInstanceHasBeenDeallocated() {
+        let store = FeedImageStoreSpy()
+        var sut: LocalFeedImageLoader? = LocalFeedImageLoader(store: store)
+        
+        var received = [LocalFeedImageLoader.SaveResult]()
+        sut?.save(Data("any data".utf8), for: anyURL) { received.append($0) }
+        
+        sut = nil
+        store.completeInsertionSuccessfully()
+        
+        XCTAssertTrue(received.isEmpty, "Expected no received results after instance has been deallocated")
+    }
  
     // MARK: - Helpers
     
@@ -110,8 +123,8 @@ final class LocalFeedImageLoaderTests: XCTestCase {
         currentDate: @escaping () -> Date = Date.init,
         file: StaticString = #file,
         line: UInt = #line
-    ) -> (sut: LocalFeedImageLoader, store: FeedStoreSpy) {
-        let store = FeedStoreSpy()
+    ) -> (sut: LocalFeedImageLoader, store: FeedImageStoreSpy) {
+        let store = FeedImageStoreSpy()
         let sut = LocalFeedImageLoader(store: store)
         trackMemoryLeaks(store, file: file, line: line)
         trackMemoryLeaks(sut, file: file, line: line)
@@ -188,7 +201,7 @@ final class LocalFeedImageLoaderTests: XCTestCase {
         wait(for: [exp], timeout: 1.0)
     }
     
-    private class FeedStoreSpy: FeedImageDataStore {
+    private class FeedImageStoreSpy: FeedImageDataStore {
         
         enum Message: Equatable {
             case retrieve(dataFor: URL)
