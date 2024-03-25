@@ -18,14 +18,14 @@ public final class LocalFeedLoader {
     
 }
 
-extension LocalFeedLoader {
-    public typealias SaveResult = Error?
+extension LocalFeedLoader: FeedCache {
+    public typealias SaveResult = Swift.Result<Void,Error>
 
     public func save(_ feed: [FeedImage], completion: @escaping (SaveResult) -> Void) {
         store.deleteCachedFeed { [weak self] error in
             guard let self = self else { return }
             if let cacheDeletionError = error {
-                completion(cacheDeletionError)
+                completion(.failure(cacheDeletionError))
             } else {
                 self.cache(feed, with: completion)
             }
@@ -38,7 +38,11 @@ extension LocalFeedLoader {
             timestamp: self.currentDate(),
             completion: { [weak self] error in
                 guard self != nil else { return }
-                completion(error)
+                if let error = error {
+                    completion(.failure(error))
+                } else {
+                    completion(.success(()))
+                }
             }
         )
     }
