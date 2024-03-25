@@ -17,19 +17,10 @@ public protocol FeedImageDataStore {
 
 public class LocalFeedImageLoader: FeedImageLoader {
     
-    public typealias SaveResult = Result<Void, Swift.Error>
-    
     private let store: FeedImageDataStore
     
     public init(store: FeedImageDataStore) {
         self.store = store
-    }
-
-    public func save(_ data: Data, for url: URL, completion: @escaping (SaveResult) -> Void) {
-        store.insert(data, for: url) { [weak self] result in
-            guard self != nil else { return }
-            completion(result.mapError { _ in SaveError.failed })
-        }
     }
     
     public func loadImageData(from url: URL, completion: @escaping (FeedImageLoader.Result) -> Void) -> FeedImageDataLoaderTask {
@@ -45,6 +36,17 @@ public class LocalFeedImageLoader: FeedImageLoader {
             )
         }
         return task
+    }
+}
+
+extension LocalFeedImageLoader: FeedImageCache {
+    public typealias SaveResult = FeedImageCache.Result
+    
+    public func save(_ data: Data, for url: URL, completion: @escaping (SaveResult) -> Void) {
+        store.insert(data, for: url) { [weak self] result in
+            guard self != nil else { return }
+            completion(result.mapError { _ in SaveError.failed })
+        }
     }
 }
 
