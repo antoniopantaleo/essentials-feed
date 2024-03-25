@@ -71,8 +71,10 @@ final class CacheFeedUseCaseTests: XCTestCase {
         let expectation = expectation(description: "Wait for save completion")
         var receivedError: Error?
         // When
-        sut.save(feed) { error in
-            receivedError = error
+        sut.save(feed) { result in
+            if case let .failure(error) = result {
+                receivedError = error
+            }
             expectation.fulfill()
         }
         store.completeDeletionSuccessfully()
@@ -151,8 +153,10 @@ final class CacheFeedUseCaseTests: XCTestCase {
         let expectation = expectation(description: "Wait for save completion")
         var receivedError: Error?
         // When
-        sut.save([uniqueImage()]) { error in
-            receivedError = error
+        sut.save([uniqueImage()]) { result in
+            if case let .failure(error) = result {
+                receivedError = error
+            }
             expectation.fulfill()
         }
         action()
