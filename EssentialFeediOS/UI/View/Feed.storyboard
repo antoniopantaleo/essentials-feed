@@ -93,6 +93,7 @@ Location</string>
                                                     <subviews>
                                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="tsT-7G-iNQ">
                                                             <rect key="frame" x="0.0" y="0.0" width="374" height="374"/>
+                                                            <accessibility key="accessibilityConfiguration" identifier="feed-image-view"/>
                                                         </imageView>
                                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ojQ-jM-69D">
                                                             <rect key="frame" x="0.0" y="0.0" width="374" height="374"/>
@@ -144,6 +145,7 @@ Location</string>
                                         <constraint firstItem="AIZ-ON-RY8" firstAttribute="top" secondItem="ZOf-kB-Mm6" secondAttribute="topMargin" priority="999" constant="6" id="zeV-IS-QiH"/>
                                     </constraints>
                                 </tableViewCellContentView>
+                                <accessibility key="accessibilityConfiguration" identifier="feed-image-cell"/>
                                 <connections>
                                     <outlet property="descriptionLabel" destination="H63-o4-rxp" id="ehO-kk-pm2"/>
                                     <outlet property="feedImageContainer" destination="FAU-iA-TTE" id="5sK-Tv-9pe"/>
@@ -179,7 +181,7 @@ Location</string>
     <resources>
         <image name="mappin.circle.fill" catalog="system" width="128" height="123"/>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
