@@ -9,13 +9,14 @@ import XCTest
 import UIKit
 import EssentialFeed
 import EssentialFeediOS
+import EssentialApp
 
 final class FeedViewControllerTests: XCTestCase {
     
     func test_feedView_hasTitle() {
         let (sut, _) = makeSUT()
         sut.simulateAppearance()
-        let bundle = Bundle(for: FeedViewController.self)
+        let bundle = Bundle(for: FeedPresenter.self)
         let localizedTitle = localized(bundle: bundle, "FEED_VIEW_TITLE")
         XCTAssertEqual(sut.title, localizedTitle)
     }

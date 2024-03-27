@@ -5,7 +5,7 @@
 //  Created by Antonio on 11/03/24.
 //
 
-import Foundation
+import EssentialFeediOS
 import EssentialFeed
 import UIKit
 
@@ -19,12 +19,12 @@ public enum FeedUIComposer {
             title: FeedPresenter.title
         )
         feedLoaderPresentationAdapter.feedPresenter = FeedPresenter(
-            feedLoadingView: WeakRefProxy(feedViewController),
             feedView: FeedImageCellControllerAdapter(
                 controller: feedViewController,
                 imageLoader: MainQueueDispatchDecorator(decoratee: imageLoader)
             ),
-            feedErrorView: WeakRefProxy(feedViewController)
+            loadingView: WeakRefProxy(feedViewController),
+            errorView: WeakRefProxy(feedViewController)
         )
         return feedViewController
     }
@@ -141,7 +141,7 @@ private final class FeedLoaderPresentationAdapter {
                 case let .success(feed):
                     feedPresenter?.didFinishLoadingFeed(with: feed)
                 case let .failure(error):
-                    feedPresenter?.didFinishLoadingFeed(withError: error)
+                    feedPresenter?.didFinishLoadingFeed(with: error)
             }
         }
     }

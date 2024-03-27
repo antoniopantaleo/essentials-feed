@@ -10,11 +10,11 @@ import EssentialFeed
 
 public final class FeedViewController: UITableViewController, UITableViewDataSourcePrefetching, FeedLoadingView, FeedErrorView {
     
-    var loadFeed: (() -> Void)?
+    public var loadFeed: (() -> Void)?
     
     @IBOutlet var errorView: ErrorView?
     private var onViewIsAppearing: ((FeedViewController) -> Void)?
-    var tableModel: [FeedImageCellController] = [] {
+    public var tableModel: [FeedImageCellController] = [] {
         didSet { tableView.reloadData() }
     }
     
@@ -36,14 +36,14 @@ public final class FeedViewController: UITableViewController, UITableViewDataSou
         loadFeed?()
     }
     
-    func display(_ viewModel: FeedLoadingViewModel) {
+    public func display(_ viewModel: FeedLoadingViewModel) {
         guard Thread.isMainThread else {
             return DispatchQueue.main.async { [weak self] in self?.display(viewModel) }
         }
         viewModel.isLoading ? refreshControl?.beginRefreshing() : refreshControl?.endRefreshing()
     }
     
-    func display(_ viewModel: FeedErrorViewModel) {
+    public func display(_ viewModel: FeedErrorViewModel) {
         errorView?.message = viewModel.message
     }
     
