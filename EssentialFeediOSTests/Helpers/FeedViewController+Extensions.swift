@@ -30,6 +30,7 @@ extension FeedViewController {
     func simulateAppearance() {
         if !isViewLoaded {
             loadViewIfNeeded()
+            setSmallFrameToPreventRenderingCells()
             swapRefreshControlForIOS17Support()
         }
         beginAppearanceTransition(true, animated: false)
@@ -78,10 +79,18 @@ extension FeedViewController {
     
     private var feedImageSection: Int { 0 }
     
+    func renderedFeedImageData(at index: Int) -> Data? {
+        return simulateViewVisible(at: index)?.renderedImage
+    }
+    
     private func swapRefreshControlForIOS17Support() {
         let fakeRefreshControl = IOS17RefreshControlSpy()
         fakeRefreshControl.setupActions(from: refreshControl)
         refreshControl = fakeRefreshControl
+    }
+    
+    private func setSmallFrameToPreventRenderingCells() {
+        tableView.frame = CGRect(x: 0, y: 0, width: 390, height: 1)
     }
     
 }
