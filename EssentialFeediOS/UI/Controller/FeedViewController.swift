@@ -36,6 +36,10 @@ public final class FeedViewController: UITableViewController, UITableViewDataSou
         loadFeed?()
     }
     
+    public func display(_ cellControllers: [FeedImageCellController]) {
+        tableModel = cellControllers
+    }
+    
     public func display(_ viewModel: FeedLoadingViewModel) {
         guard Thread.isMainThread else {
             return DispatchQueue.main.async { [weak self] in self?.display(viewModel) }
