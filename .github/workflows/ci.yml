@@ -12,7 +12,7 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v3
       - name: Select Xcode version
-        run: sudo xcode-select -switch /Applications/Xcode.app
+        run: sudo xcode-select -switch /Applications/Xcode_15.1.app
       - name: Clean
         run: |
           xcodebuild clean -project EssentialFeed.xcodeproj -scheme "CI_macOS" -sdk macosx -destination "platform=macOS" ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO
