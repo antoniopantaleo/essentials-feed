@@ -16,12 +16,12 @@ jobs:
       - name: Clean
         run: |
           xcodebuild clean -project EssentialFeed.xcodeproj -scheme "CI_macOS" -sdk macosx -destination "platform=macOS" ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO
-          xcodebuild clean -project EssentialFeed.xcodeproj -scheme "CI_iOS" -sdk iphonesimulator -destination "platform=iOS Simulator,OS=16.0,name=iPhone 14" ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO
+          xcodebuild clean -project EssentialFeed.xcodeproj -scheme "CI_iOS" -sdk iphonesimulator -destination "platform=iOS Simulator,OS=17.0,name=iPhone 14" ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO
       - name: Build
         run: |
           xcodebuild build -project EssentialFeed.xcodeproj -scheme "CI_macOS" -sdk macosx -destination "platform=macOS" ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO
-          xcodebuild build -project EssentialFeed.xcodeproj -scheme "CI_iOS" -sdk iphonesimulator -destination "platform=iOS Simulator,OS=16.0,name=iPhone 14" ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO
+          xcodebuild build -project EssentialFeed.xcodeproj -scheme "CI_iOS" -sdk iphonesimulator -destination "platform=iOS Simulator,OS=17.0,name=iPhone 14" ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO
       - name: Test
         run: |
           xcodebuild test -project EssentialFeed.xcodeproj -scheme "CI_macOS" -sdk macosx -destination "platform=macOS" ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO
-          xcodebuild test -project EssentialFeed.xcodeproj -scheme "CI_iOS" -sdk iphonesimulator -destination "platform=iOS Simulator,OS=16.0,name=iPhone 14" ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO
+          xcodebuild test -project EssentialFeed.xcodeproj -scheme "CI_iOS" -sdk iphonesimulator -destination "platform=iOS Simulator,OS=17.0,name=iPhone 14" ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO
