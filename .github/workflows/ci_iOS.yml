@@ -7,7 +7,7 @@ on:
 jobs:
   build-and-test:
     name: Build and run tests
-    runs-on: macos-13
+    runs-on: macos-14
     steps:
       - name: Checkout project
         uses: actions/checkout@v3
@@ -15,10 +15,10 @@ jobs:
         run: sudo xcode-select -switch /Applications/Xcode_15.1.app
       - name: Clean
         run: |
-          xcodebuild clean -project EssentialFeed.xcodeproj -scheme "CI_iOS" -sdk iphonesimulator -destination "platform=iOS Simulator,OS=17.0,name=iPhone 14" ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO
+          xcodebuild clean -project EssentialFeed.xcodeproj -scheme "CI_iOS" -sdk iphonesimulator -destination "platform=iOS Simulator,OS=17.2,name=iPhone 15" ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO
       - name: Build
         run: |
-          xcodebuild build -project EssentialFeed.xcodeproj -scheme "CI_iOS" -sdk iphonesimulator -destination "platform=iOS Simulator,OS=17.0,name=iPhone 14" ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO
+          xcodebuild build -project EssentialFeed.xcodeproj -scheme "CI_iOS" -sdk iphonesimulator -destination "platform=iOS Simulator,OS=17.2,name=iPhone 15" ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO
       - name: Test
         run: |
-          xcodebuild test -project EssentialFeed.xcodeproj -scheme "CI_iOS" -sdk iphonesimulator -destination "platform=iOS Simulator,OS=17.0,name=iPhone 14" ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO
+          xcodebuild test -project EssentialFeed.xcodeproj -scheme "CI_iOS" -sdk iphonesimulator -destination "platform=iOS Simulator,OS=17.2,name=iPhone 15" ONLY_ACTIVE_ARCH=YES CODE_SIGNING_REQUIRED=NO
