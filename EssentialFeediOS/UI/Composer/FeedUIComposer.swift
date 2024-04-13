@@ -11,7 +11,10 @@ import Combine
 import UIKit
 
 public enum FeedUIComposer {
-    static func feedViewController(feedLoader: @escaping () -> FeedLoader.Publisher, imageLoader: FeedImageLoader) -> FeedViewController {
+    static func feedViewController(
+        feedLoader: @escaping () -> FeedLoader.Publisher,
+        imageLoader: @escaping (URL) -> FeedImageLoader.Publisher
+    ) -> FeedViewController {
         let feedLoaderPresentationAdapter = FeedLoaderPresentationAdapter(
             feedLoader: { feedLoader().dispatchOnMainQueue() }
         )
@@ -22,7 +25,7 @@ public enum FeedUIComposer {
         feedLoaderPresentationAdapter.feedPresenter = FeedPresenter(
             feedView: FeedImageCellControllerAdapter(
                 controller: feedViewController,
-                imageLoader: MainQueueDispatchDecorator(decoratee: imageLoader)
+                imageLoader: { imageLoader($0).dispatchOnMainQueue() }
             ),
             loadingView: WeakRefProxy(feedViewController),
             errorView: WeakRefProxy(feedViewController)
@@ -42,31 +45,6 @@ private extension FeedViewController {
     }
 }
 
-
-private final class MainQueueDispatchDecorator<T> {
-    private let decoratee: T
-    
-    init(decoratee: T) {
-        self.decoratee = decoratee
-    }
-    
-    func dispatch(completion: @escaping () -> Void) {
-        guard Thread.isMainThread else {
-            return DispatchQueue.main.async(execute: completion)
-        }
-        
-        completion()
-    }
-}
-
-
-extension MainQueueDispatchDecorator: FeedImageLoader where T == FeedImageLoader {
-    func loadImageData(from url: URL, completion: @escaping (FeedImageLoader.Result) -> Void) -> FeedImageDataLoaderTask {
-        return decoratee.loadImageData(from: url) { [weak self] result in
-            self?.dispatch { completion(result) }
-        }
-    }
-}
 
 private final class WeakRefProxy<T: AnyObject> {
     private weak var instance: T?
@@ -97,9 +75,9 @@ extension WeakRefProxy: FeedErrorView where T: FeedErrorView {
 private final class FeedImageCellControllerAdapter: FeedView {
     
     private weak var controller: FeedViewController?
-    private let imageLoader: FeedImageLoader
+    private let imageLoader: (URL) -> FeedImageLoader.Publisher
     
-    init(controller: FeedViewController, imageLoader: FeedImageLoader) {
+    init(controller: FeedViewController, imageLoader: @escaping (URL) -> FeedImageLoader.Publisher) {
         self.controller = controller
         self.imageLoader = imageLoader
     }
@@ -146,31 +124,32 @@ private final class FeedLoaderPresentationAdapter {
 
 private final class FeedImageLoaderPresentationAdapter<View: FeedImageView, Image>: FeedImageCellControllerDelegate where View.Image == Image {
     private let model: FeedImage
-    private let imageLoader: FeedImageLoader
-    private var task: FeedImageDataLoaderTask?
+    private let imageLoader: (URL) -> FeedImageLoader.Publisher
+    private var cancellable: AnyCancellable?
     
     var presenter: FeedImagePresenter<View, Image>?
     
-    init(model: FeedImage, imageLoader: FeedImageLoader) {
+    init(model: FeedImage, imageLoader: @escaping (URL) -> FeedImageLoader.Publisher) {
         self.model = model
         self.imageLoader = imageLoader
     }
     
     func didRequestImage() {
         presenter?.didStartLoadingImageData(for: model)
-        
         let model = self.model
-        task = imageLoader.loadImageData(from: model.url) { [weak presenter] result in
-            switch result {
-                case let .success(data):
-                    presenter?.didFinishLoadingImageData(with: data, for: model)
-                case let .failure(error):
+        cancellable = imageLoader(model.url).sink(
+            receiveCompletion: { [weak presenter] completion in
+                if case let .failure(error) = completion {
                     presenter?.didFinishLoadingImageData(with: error, for: model)
+                }
+            },
+            receiveValue: { [weak presenter] data in
+                presenter?.didFinishLoadingImageData(with: data, for: model)
             }
-        }
+        )
     }
     
     func didCancelImageRequest() {
-        task?.cancel()
+        cancellable?.cancel()
     }
 }
