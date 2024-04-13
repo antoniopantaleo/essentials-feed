@@ -331,7 +331,7 @@ final class FeedViewControllerTests: XCTestCase {
         sut.simulateUserInitiatedFeedReload()
         XCTAssertEqual(sut.errorMessage, nil)
         
-        loader.completeFeedLoadingWithError()
+        loader.completeFeedLoadingWithError(at: 1)
         XCTAssertEqual(sut.errorMessage, localized(bundle: bundle, "FEED_VIEW_CONNECTION_ERROR"))
         XCTAssertNoThrow(try sut.simulateTapOnErrorView())
         XCTAssertEqual(sut.errorMessage, nil)
