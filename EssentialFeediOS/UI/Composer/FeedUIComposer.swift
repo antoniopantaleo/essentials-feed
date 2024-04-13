@@ -7,12 +7,13 @@
 
 import EssentialFeediOS
 import EssentialFeed
+import Combine
 import UIKit
 
 public enum FeedUIComposer {
-    public static func feedViewController(feedLoader: FeedLoader, imageLoader: FeedImageLoader) -> FeedViewController {
+    static func feedViewController(feedLoader: @escaping () -> FeedLoader.Publisher, imageLoader: FeedImageLoader) -> FeedViewController {
         let feedLoaderPresentationAdapter = FeedLoaderPresentationAdapter(
-            feedLoader: MainQueueDispatchDecorator(decoratee: feedLoader)
+            feedLoader: { feedLoader().dispatchOnMainQueue() }
         )
         let feedViewController = FeedViewController.makeWith(
             loadFeed: feedLoaderPresentationAdapter.loadFeed,
@@ -127,23 +128,26 @@ private final class FeedImageCellControllerAdapter: FeedView {
 }
 
 private final class FeedLoaderPresentationAdapter {
-    private let feedLoader: FeedLoader
+    private let feedLoader: () -> FeedLoader.Publisher
     var feedPresenter: FeedPresenter?
+    private var cancellable: AnyCancellable?
     
-    init(feedLoader: FeedLoader) {
+    init(feedLoader: @escaping () -> FeedLoader.Publisher) {
         self.feedLoader = feedLoader
     }
     
     func loadFeed() {
         feedPresenter?.didStartLoadingFeed()
-        feedLoader.load { [weak feedPresenter] result in
-            switch result {
-                case let .success(feed):
-                    feedPresenter?.didFinishLoadingFeed(with: feed)
-                case let .failure(error):
+        cancellable = feedLoader().sink(
+            receiveCompletion: { [weak feedPresenter] completion in
+                if case let .failure(error) = completion {
                     feedPresenter?.didFinishLoadingFeed(with: error)
+                }
+            },
+            receiveValue: { [weak feedPresenter] feed in
+                feedPresenter?.didFinishLoadingFeed(with: feed)
             }
-        }
+        )
     }
 }
 
