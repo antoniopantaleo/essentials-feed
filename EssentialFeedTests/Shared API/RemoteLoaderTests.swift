@@ -40,41 +40,31 @@ final class RemoteLoaderTests: XCTestCase {
         })
     }
     
-    func test_loadImageDataFromURL_deliversInvalidDataErrorOnNon200HTTPResponse() {
-        let (sut, client) = makeSUT()
-        
-        let samples = [199, 201, 300, 400, 500]
-        
-        samples.enumerated().forEach { index, code in
-            expect(sut, toCompleteWith: failure(.invalidData), when: {
-                client.complete(withStatusCode: code, data: Data("any-data".utf8), at: index)
-            })
-        }
-    }
-    
-    func test_loadImageDataFromURL_deliversInvalidDataErrorOn200HTTPResponseWithEmptyData() {
-        let (sut, client) = makeSUT()
-        
+    func test_load_deliversErrorOnMapperError() {
+        let (sut, client) = makeSUT(mapper: { _, _ in
+            throw anyNSError
+        })
         expect(sut, toCompleteWith: failure(.invalidData), when: {
-            let emptyData = Data()
-            client.complete(withStatusCode: 200, data: emptyData)
+            client.complete(withStatusCode: 200, data: anyData())
         })
     }
     
-    func test_loadImageDataFromURL_deliversReceivedNonEmptyDataOn200HTTPResponse() {
-        let (sut, client) = makeSUT()
-        let nonEmptyData = Data("non-empty data".utf8)
-        
-        expect(sut, toCompleteWith: .success(nonEmptyData), when: {
-            client.complete(withStatusCode: 200, data: nonEmptyData)
+    func test_load_deliversMappedResource() {
+        let resource = "a resource"
+        let (sut, client) = makeSUT(mapper: { data, _ in
+            String(data: data, encoding: .utf8)!
+        })
+        expect(sut, toCompleteWith: .success(resource), when: {
+            client.complete(withStatusCode: 200, data: Data(resource.utf8))
         })
     }
+                                    
     
     func test_loadImageDataFromURL_doesNotDeliverResultAfterSUTInstanceHasBeenDeallocated() {
         let client = HTTPClientSpy()
-        var sut: RemoteFeedImageLoader? = RemoteFeedImageLoader(client: client)
+        var sut: RemoteLoader<String>? = RemoteLoader<String>(url: url, client: client, mapper: { _, _ in "any" })
         
-        var capturedResults = [FeedImageLoader.Result]()
+        var capturedResults = [RemoteLoader<String>.Result]()
         _ = sut?.loadImageData(from: anyURL) { capturedResults.append($0) }
         
         sut = nil
@@ -86,23 +76,24 @@ final class RemoteLoaderTests: XCTestCase {
     //MARK: - Helpers
     private func makeSUT(
         url: URL = anyURL,
+        mapper: @escaping RemoteLoader<String>.Mapper = { _, _ in "any" },
         file: StaticString = #file,
         line: UInt = #line
     ) -> (sut: RemoteFeedImageLoader, client: HTTPClientSpy) {
         let client = HTTPClientSpy()
-        let sut = RemoteFeedImageLoader(client: client)
+        let sut = RemoteLoader<String>(url: url, client: client, mapper: mapper)
         trackMemoryLeaks(sut, file: file, line: line)
         trackMemoryLeaks(client, file: file, line: line)
         return (sut, client)
     }
     
-    private func failure(_ error: RemoteFeedImageLoader.Error) -> FeedImageLoader.Result {
+    private func failure(_ error: RemoteLoader<String>.Error) -> RemoteLoader<String>.Result {
         return .failure(error)
     }
     
     private func expect(
-        _ sut: RemoteFeedImageLoader,
-        toCompleteWith expectedResult: FeedImageLoader.Result,
+        _ sut: RemoteLoader<String>,
+        toCompleteWith expectedResult: RemoteLoader<String>.Result,
         when action: () -> Void,
         file: StaticString = #file,
         line: UInt = #line
@@ -114,7 +105,7 @@ final class RemoteLoaderTests: XCTestCase {
             switch (receivedResult, expectedResult) {
             case let (.success(receivedData), .success(expectedData)):
                 XCTAssertEqual(receivedData, expectedData, file: file, line: line)
-            case let (.failure(receivedError as RemoteFeedImageLoader.Error), .failure(expectedError as RemoteFeedImageLoader.Error)):
+            case let (.failure(receivedError as RemoteLoader<String>.Error), .failure(expectedError as RemoteLoader<String>.Error)):
                 XCTAssertEqual(receivedError, expectedError, file: file, line: line)
             case let (.failure(receivedError as NSError), .failure(expectedError as NSError)):
                 XCTAssertEqual(receivedError, expectedError, file: file, line: line)
