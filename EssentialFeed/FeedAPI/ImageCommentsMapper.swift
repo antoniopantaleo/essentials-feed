@@ -9,7 +9,6 @@ import Foundation
 
 final class ImageCommentsMapper {
     private static let decoder = JSONDecoder()
-    private static let OK_200 = 200
     
     private struct Root: Decodable {
         let items: [RemoteFeedItem]
@@ -18,9 +17,13 @@ final class ImageCommentsMapper {
     /// A way to avoid to weak-ify self and avoid reatin cycles is to use static func
     static func map(_ data: Data, from response: HTTPURLResponse) throws -> [RemoteFeedItem] {
         guard
-            response.statusCode == OK_200,
+            isOK(response),
             let root = try? decoder.decode(Root.self, from: data)
-        else { throw RemoteFeedLoader.Error.invalidData }
+        else { throw RemoteImageCommentsLoader.Error.invalidData }
         return root.items
+    }
+    
+    private static func isOK(_ response: HTTPURLResponse) -> Bool {
+        (200...299).contains(response.statusCode)
     }
 }

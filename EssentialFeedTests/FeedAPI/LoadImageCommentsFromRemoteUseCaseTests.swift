@@ -40,9 +40,9 @@ final class LoadImageCommentsFromRemoteUseCaseTests: XCTestCase {
     }
     
     // wrong HTTP status code
-    func test_load_deliversErrorOnNon200HTTPResponse() {
+    func test_load_deliversErrorOnNon2xxHTTPResponse() {
         let (sut, client) = makeSUT()
-        let statusCodes = [199, 201, 300, 400, 500]
+        let statusCodes = [199, 140, 300, 400, 500]
         
         statusCodes
             .enumerated()
@@ -72,34 +72,41 @@ final class LoadImageCommentsFromRemoteUseCaseTests: XCTestCase {
         XCTAssertEqual(client.requestedURLs, [url, url])
     }
     
-    func test_load_deliversErrorOn200HTTPResponseWithInvalidJSON() {
+    func test_load_deliversErrorOn2xxHTTPResponseWithInvalidJSON() {
         let (sut, client) = makeSUT()
         
-        expect(
-            sut,
-            toCompleteWithResult: failure(.invalidData),
-            when: {
-                let invalidJson = Data("invalid data".utf8)
-                client.complete(withStatusCode: 200, data: invalidJson)
-            }
-        )
+        let samples = [200, 201, 250, 280, 299]
+        samples.enumerated().forEach { index, code in
+            expect(
+                sut,
+                toCompleteWithResult: failure(.invalidData),
+                when: {
+                    let invalidJson = Data("invalid data".utf8)
+                    client.complete(withStatusCode: code, data: invalidJson, at: index)
+                }
+            )
+        }
     }
     
-    func test_load_deliversNoItemsOn200HTTPResponseWithEmptyJSONList() {
+    func test_load_deliversNoItemsOn2xxHTTPResponseWithEmptyJSONList() {
         let (sut, client) = makeSUT()
         
-        expect(
-            sut,
-            toCompleteWithResult: .success([]),
-            when: {
-                let emptyJsonList = makeItemsJSON([])
-                client.complete(withStatusCode: 200, data: emptyJsonList)
-            }
-        )
+        let samples = [200, 201, 250, 280, 299]
+        
+        samples.enumerated().forEach { index, code in
+            expect(
+                sut,
+                toCompleteWithResult: .success([]),
+                when: {
+                    let emptyListJSON = makeItemsJSON([])
+                    client.complete(withStatusCode: code, data: emptyListJSON, at: index)
+                }
+            )
+        }
     }
     
     // Happy Path
-    func test_load_deliversItemsOn200HTTPResponseWithJSONItems() {
+    func test_load_deliversItemsOn2xxHTTPResponseWithJSONItems() {
         let (sut, client) = makeSUT()
         
         let item1 = makeItem(
@@ -115,21 +122,26 @@ final class LoadImageCommentsFromRemoteUseCaseTests: XCTestCase {
         )
         
         let models = [item1.model, item2.model]
-        expect(
-            sut,
-            toCompleteWithResult: .success(models),
-            when: {
-                let json = makeItemsJSON([item1.json, item2.json])
-                client.complete(withStatusCode: 200, data: json)
-            }
-        )
+        
+        let samples = [200, 201, 250, 280, 299]
+        
+        samples.enumerated().forEach { index, code in
+            expect(
+                sut,
+                toCompleteWithResult: .success(models),
+                when: {
+                    let json = makeItemsJSON([item1.json, item2.json])
+                    client.complete(withStatusCode: code, data: json, at: index)
+                }
+            )
+        }
     }
     
     func test_load_doesNotDeliverResultAfterSUTInstanceHasBeenDeallocated() {
         let url = URL(string: "https://any-url.com")!
         let client = HTTPClientSpy()
-        var sut: RemoteFeedLoader? = RemoteFeedLoader(url: url, client: client)
-        var capturedResults = [RemoteFeedLoader.Result]()
+        var sut: RemoteImageCommentsLoader? = RemoteImageCommentsLoader(url: url, client: client)
+        var capturedResults = [RemoteImageCommentsLoader.Result]()
         sut?.load { capturedResults.append($0) }
         /// Here we are simulating that after a SUT has been dismissed, a client still does something
         sut = nil
@@ -144,10 +156,10 @@ final class LoadImageCommentsFromRemoteUseCaseTests: XCTestCase {
         url: URL = URL(string: "https://a-url.com")!,
         file: StaticString = #filePath,
         line: UInt = #line
-    ) -> (sut: RemoteFeedLoader, client: HTTPClientSpy) {
+    ) -> (sut: RemoteImageCommentsLoader, client: HTTPClientSpy) {
         /// We need to check memory leaks both for the client and the SUT
         let client = HTTPClientSpy()
-        let sut = RemoteFeedLoader(url: url, client: client)
+        let sut = RemoteImageCommentsLoader(url: url, client: client)
         trackMemoryLeaks(sut, file: file, line: line)
         trackMemoryLeaks(client, file: file, line: line)
         return (sut, client)
@@ -180,7 +192,7 @@ final class LoadImageCommentsFromRemoteUseCaseTests: XCTestCase {
         return (model, json)
     }
     
-    private func failure(_ error: RemoteFeedLoader.Error) -> RemoteFeedLoader.Result {
+    private func failure(_ error: RemoteImageCommentsLoader.Error) -> RemoteImageCommentsLoader.Result {
         .failure(error)
     }
     
@@ -190,8 +202,8 @@ final class LoadImageCommentsFromRemoteUseCaseTests: XCTestCase {
     }
     
     private func expect(
-        _ sut: RemoteFeedLoader,
-        toCompleteWithResult expectedResult: RemoteFeedLoader.Result,
+        _ sut: RemoteImageCommentsLoader,
+        toCompleteWithResult expectedResult: RemoteImageCommentsLoader.Result,
         when action: () -> Void,
         file: StaticString = #filePath,
         line: UInt = #line
@@ -204,8 +216,8 @@ final class LoadImageCommentsFromRemoteUseCaseTests: XCTestCase {
             case (.success(let receivedItems), .success(let expectedItems)):
                 XCTAssertEqual(receivedItems, expectedItems, file: file, line: line)
             case (
-                .failure(let receivedError as RemoteFeedLoader.Error),
-                .failure(let expectedError as RemoteFeedLoader.Error)
+                .failure(let receivedError as RemoteImageCommentsLoader.Error),
+                .failure(let expectedError as RemoteImageCommentsLoader.Error)
             ):
                 XCTAssertEqual(receivedError, expectedError, file: file, line: line)
             default:
