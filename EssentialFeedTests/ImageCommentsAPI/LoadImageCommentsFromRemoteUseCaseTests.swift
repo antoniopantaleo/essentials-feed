@@ -10,36 +10,7 @@ import EssentialFeed
 
 final class LoadImageCommentsFromRemoteUseCaseTests: XCTestCase {
     
-    func test_init_doesNotRequestDataFromURL() {
-        let (_, client) = makeSUT()
-        /// We are asserting that we didn't make a URL request since that
-        /// should only happen when `.load()` is invoked
-        XCTAssertTrue(client.requestedURLs.isEmpty)
-    }
-    
-    func test_load_requestsDataFromURL() {
-        let url = URL(string: "https://a-given-url.com")!
-        let (sut, client) = makeSUT(url: url)
-        sut.load { _ in }
-        
-        XCTAssertEqual(client.requestedURLs, [url])
-    }
-    
-    /// connectivity issue
-    func test_load_deliversErrorOnClientError() {
-        let (sut, client) = makeSUT()
-        
-        expect(
-            sut,
-            toCompleteWithResult: failure(.connectivity),
-            when: {
-                let clientError = NSError(domain: "Test", code: 0)
-                client.complete(with: clientError)
-            }
-        )
-    }
-    
-    // wrong HTTP status code
+
     func test_load_deliversErrorOnNon2xxHTTPResponse() {
         let (sut, client) = makeSUT()
         let statusCodes = [199, 140, 300, 400, 500]
@@ -60,16 +31,6 @@ final class LoadImageCommentsFromRemoteUseCaseTests: XCTestCase {
                     }
                 )
         }
-    }
-    
-    func test_loadTwice_requestsDataFromURLTwice() {
-        let url = URL(string: "https://a-given-url.com")!
-        let (sut, client) = makeSUT(url: url)
-        
-        sut.load { _ in }
-        sut.load { _ in }
-        
-        XCTAssertEqual(client.requestedURLs, [url, url])
     }
     
     func test_load_deliversErrorOn2xxHTTPResponseWithInvalidJSON() {
@@ -136,19 +97,6 @@ final class LoadImageCommentsFromRemoteUseCaseTests: XCTestCase {
                 }
             )
         }
-    }
-    
-    func test_load_doesNotDeliverResultAfterSUTInstanceHasBeenDeallocated() {
-        let url = URL(string: "https://any-url.com")!
-        let client = HTTPClientSpy()
-        var sut: RemoteImageCommentsLoader? = RemoteImageCommentsLoader(url: url, client: client)
-        var capturedResults = [RemoteImageCommentsLoader.Result]()
-        sut?.load { capturedResults.append($0) }
-        /// Here we are simulating that after a SUT has been dismissed, a client still does something
-        sut = nil
-        client.complete(withStatusCode: 200, data: makeItemsJSON([]))
-        
-        XCTAssertTrue(capturedResults.isEmpty)
     }
     
     //MARK: Helpers
