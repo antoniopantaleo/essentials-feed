@@ -12,7 +12,7 @@ import UIKit
 
 public enum FeedUIComposer {
     static func feedViewController(
-        feedLoader: @escaping () -> FeedLoader.Publisher,
+        feedLoader: @escaping () -> AnyPublisher<[FeedImage], Error>,
         imageLoader: @escaping (URL) -> FeedImageLoader.Publisher
     ) -> FeedViewController {
         let feedLoaderPresentationAdapter = FeedLoaderPresentationAdapter(
@@ -99,11 +99,11 @@ private final class FeedImageCellControllerAdapter: FeedView {
 }
 
 private final class FeedLoaderPresentationAdapter {
-    private let feedLoader: () -> FeedLoader.Publisher
+    private let feedLoader: () -> AnyPublisher<[FeedImage], Error>
     var feedPresenter: FeedPresenter?
     private var cancellable: AnyCancellable?
     
-    init(feedLoader: @escaping () -> FeedLoader.Publisher) {
+    init(feedLoader: @escaping () -> AnyPublisher<[FeedImage], Error>) {
         self.feedLoader = feedLoader
     }
     

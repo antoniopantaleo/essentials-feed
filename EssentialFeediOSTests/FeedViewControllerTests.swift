@@ -9,6 +9,7 @@ import XCTest
 import UIKit
 import EssentialFeed
 import EssentialFeediOS
+import Combine
 @testable import EssentialApp
 
 final class FeedViewControllerTests: XCTestCase {
@@ -400,7 +401,7 @@ final class FeedViewControllerTests: XCTestCase {
         )
     }
     
-    class LoaderSpy: FeedLoader, FeedImageLoader {
+    class LoaderSpy: FeedImageLoader {
         
         struct TaskSpy: FeedImageDataLoaderTask {
             var onCancel: (() -> Void)
@@ -409,21 +410,20 @@ final class FeedViewControllerTests: XCTestCase {
             }
         }
         
-        typealias LoadCompletion = ((LoadFeedResult) -> Void)
-        private var completions = [LoadCompletion]()
+        private var feedRequests = [PassthroughSubject<[FeedImage], Error>]()
         private var imageRequests = [(url: URL, completion: (FeedImageLoader.Result) -> Void)]()
         
-        var loadCallCount: Int  { completions.count }
+        var loadCallCount: Int  { feedRequests.count }
         var loadedImageURLs: [URL] { imageRequests.map { $0.url } }
         private(set) var cancelledImageURLs = [URL]()
         
         func completeFeedLoadingWithError(at index: Int = 0) {
             let error = NSError(domain: "an error", code: 0)
-            completions[index](.failure(error))
+            feedRequests[index].send(completion: .failure(error))
         }
         
         func completeFeedLoading(with feed: [FeedImage] = [], at index: Int = 0) {
-            completions[index](.success(feed))
+            feedRequests[index].send(feed)
         }
         
         func completeImageLoading(with imageData: Data = Data(), at index: Int = 0) {
@@ -435,8 +435,10 @@ final class FeedViewControllerTests: XCTestCase {
             imageRequests[index].completion(.failure(error))
         }
         
-        func load(completion: @escaping (LoadFeedResult) -> Void) {
-            completions.append(completion)
+        func loadPublisher() -> AnyPublisher<[FeedImage], Error> {
+            let publisher = PassthroughSubject<[FeedImage], Error>()
+            feedRequests.append(publisher)
+            return publisher.eraseToAnyPublisher()
         }
         
         func loadImageData(from url: URL, completion: @escaping (FeedImageLoader.Result) -> Void)  -> FeedImageDataLoaderTask {
