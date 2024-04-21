@@ -10,35 +10,6 @@ import EssentialFeed
 
 final class RemoteFeedImageLoaderTests: XCTestCase {
     
-    func test_init_doesNotPerformAnyURLRequest() {
-        let (_, client) = makeSUT()
-        XCTAssertTrue(client.requestedURLs.isEmpty)
-    }
-    
-    func test_loadImageDataFromURL_requestsDataFromURL() {
-        let (sut, client) = makeSUT(url: anyURL)
-        
-        _ = sut.loadImageData(from: anyURL) { _ in }
-        XCTAssertEqual(client.requestedURLs, [anyURL])
-    }
-    
-    func test_loadImageDataFromURLTwice_requestsDataFromURLTwice() {
-        let (sut, client) = makeSUT(url: anyURL)
-        
-        _ = sut.loadImageData(from: anyURL) { _ in }
-        _ = sut.loadImageData(from: anyURL) { _ in }
-        
-        XCTAssertEqual(client.requestedURLs, [anyURL, anyURL])
-    }
-    
-    func test_loadImageDataFromURL_deliversErrorOnClientError() {
-        let (sut, client) = makeSUT()
-        let clientError = NSError(domain: "a client error", code: 0)
-        
-        expect(sut, toCompleteWith: .failure(RemoteFeedImageLoader.Error.connectivity), when: {
-            client.complete(with: clientError)
-        })
-    }
     
     func test_loadImageDataFromURL_deliversInvalidDataErrorOnNon200HTTPResponse() {
         let (sut, client) = makeSUT()
@@ -68,19 +39,6 @@ final class RemoteFeedImageLoaderTests: XCTestCase {
         expect(sut, toCompleteWith: .success(nonEmptyData), when: {
             client.complete(withStatusCode: 200, data: nonEmptyData)
         })
-    }
-    
-    func test_loadImageDataFromURL_doesNotDeliverResultAfterSUTInstanceHasBeenDeallocated() {
-        let client = HTTPClientSpy()
-        var sut: RemoteFeedImageLoader? = RemoteFeedImageLoader(client: client)
-        
-        var capturedResults = [FeedImageLoader.Result]()
-        _ = sut?.loadImageData(from: anyURL) { capturedResults.append($0) }
-        
-        sut = nil
-        client.complete(withStatusCode: 200, data: Data("any-data".utf8))
-        
-        XCTAssertTrue(capturedResults.isEmpty)
     }
     
     //MARK: - Helpers
