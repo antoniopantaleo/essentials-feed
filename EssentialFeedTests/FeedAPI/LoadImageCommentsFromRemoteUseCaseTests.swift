@@ -111,16 +111,17 @@ final class LoadImageCommentsFromRemoteUseCaseTests: XCTestCase {
         
         let item1 = makeItem(
             id: UUID(),
-            imageURL: URL(string: "https://a-url.com")!
+            message: "a message",
+            createdAt: (Date(timeIntervalSince1970: 1598627222), "2020-08-28T15:07:02+00:00"),
+            username: "a username"
         )
         
         let item2 = makeItem(
             id: UUID(),
-            description: "a description",
-            location: "a location",
-            imageURL: URL(string: "https://another-url.com")!
+            message: "another message",
+            createdAt: (Date(timeIntervalSince1970: 1577881882), "2020-01-01T12:31:22+00:00"),
+            username: "another username"
         )
-        
         let models = [item1.model, item2.model]
         
         let samples = [200, 201, 250, 280, 299]
@@ -168,25 +169,30 @@ final class LoadImageCommentsFromRemoteUseCaseTests: XCTestCase {
     // Factory Method
     private func makeItem(
         id: UUID,
-        description: String? = nil,
-        location: String? = nil,
-        imageURL: URL
-    ) -> (model: FeedImage, json: [String: Any]) {
-        let model = FeedImage(
+        message: String,
+        createdAt: (date: Date, iso8601String: String),
+        username: String
+    ) -> (
+        model: ImageComment,
+        json: [String: Any]
+    ) {
+        let model = ImageComment(
             id: id,
-            description: description,
-            location: location,
-            url: imageURL
+            message: message,
+            createdAt: createdAt.date,
+            username: username
         )
         
         /// We use compact map to remove optional values
         /// Otherwise the types don't matches
         /// [String:Any?] != [String:Any]
-        let json = [
+        let json: [String: Any] = [
             "id": model.id.uuidString,
-            "description": model.description,
-            "location": model.location,
-            "image": model.url.absoluteString
+            "message": message,
+            "created_at": createdAt.iso8601String,
+            "author": [
+                "username": username
+            ]
         ].compactMapValues { $0 }
         
         return (model, json)

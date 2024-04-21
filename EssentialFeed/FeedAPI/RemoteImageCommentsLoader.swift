@@ -7,7 +7,7 @@
 
 import Foundation
 
-public final class RemoteImageCommentsLoader: FeedLoader {
+public final class RemoteImageCommentsLoader {
     private let url: URL
     private let client: HTTPClient
     
@@ -16,8 +16,7 @@ public final class RemoteImageCommentsLoader: FeedLoader {
         case invalidData
     }
     
-    /// We are specyfing the error type here
-    public typealias Result = LoadFeedResult
+    public typealias Result = Swift.Result<[ImageComment], Swift.Error>
     
     public init(url: URL, client: HTTPClient) {
         self.client = client
@@ -42,22 +41,9 @@ public final class RemoteImageCommentsLoader: FeedLoader {
     private static func map(_ data: Data, from response: HTTPURLResponse) -> Result {
         do {
             let items = try ImageCommentsMapper.map(data, from: response)
-            return .success(items.toModel)
+            return .success(items)
         } catch {
             return .failure(error)
-        }
-    }
-}
-
-fileprivate extension Array where Element == RemoteFeedItem {
-    var toModel: [FeedImage] {
-        map {
-            FeedImage(
-                id: $0.id,
-                description: $0.description,
-                location: $0.location,
-                url: $0.image
-            )
         }
     }
 }
