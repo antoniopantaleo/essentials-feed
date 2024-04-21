@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class FeedItemsMapper {
+public final class FeedItemsMapper {
     private static let decoder = JSONDecoder()
     private static let OK_200 = 200
     
@@ -33,8 +33,7 @@ final class FeedItemsMapper {
         }
     }
     
-    /// A way to avoid to weak-ify self and avoid reatin cycles is to use static func
-    static func map(_ data: Data, from response: HTTPURLResponse) throws -> [FeedImage] {
+    public static func map(_ data: Data, from response: HTTPURLResponse) throws -> [FeedImage] {
         guard
             response.statusCode == OK_200,
             let root = try? decoder.decode(Root.self, from: data)
