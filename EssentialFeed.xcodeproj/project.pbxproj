@@ -25,12 +25,12 @@
 		0799E6142B94EC6300719015 /* EssentialFeediOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0799E60C2B94EC6300719015 /* EssentialFeediOS.framework */; };
 		07B589CA2BD54CCC00B4C123 /* ImageCommentsMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B589C92BD54CCC00B4C123 /* ImageCommentsMapper.swift */; };
 		07B589CC2BD54D1100B4C123 /* RemoteImageCommentsLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B589CB2BD54D1100B4C123 /* RemoteImageCommentsLoader.swift */; };
-		07B589CE2BD54D5000B4C123 /* LoadImageCommentsFromRemoteUseCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B589CD2BD54D5000B4C123 /* LoadImageCommentsFromRemoteUseCaseTests.swift */; };
 		07B589D12BD5517E00B4C123 /* ImageComment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B589D02BD5517E00B4C123 /* ImageComment.swift */; };
 		07B589D72BD554C900B4C123 /* URLProtocolStub.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B589D62BD554C900B4C123 /* URLProtocolStub.swift */; };
 		07B589DB2BD5552500B4C123 /* HTTPClientSpy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B589DA2BD5552500B4C123 /* HTTPClientSpy.swift */; };
 		07B589DE2BD5568B00B4C123 /* RemoteLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B589DD2BD5568B00B4C123 /* RemoteLoader.swift */; };
 		07B589E12BD55C4C00B4C123 /* FeedItemsMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B589E02BD55C4C00B4C123 /* FeedItemsMapperTests.swift */; };
+		07B589E32BD55D1A00B4C123 /* ImageCommentsMapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B589E22BD55D1A00B4C123 /* ImageCommentsMapperTests.swift */; };
 		07C8B96C2AA3845000DCB5FF /* CacheFeedUseCaseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C8B96B2AA3845000DCB5FF /* CacheFeedUseCaseTests.swift */; };
 		A90B3ABD2BA0EA2C0071F78D /* ErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A90B3ABC2BA0EA2C0071F78D /* ErrorView.swift */; };
 		A92382552B9371DB008A0808 /* CoreDataFeedStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A92382542B9371DB008A0808 /* CoreDataFeedStoreTests.swift */; };
@@ -155,13 +155,13 @@
 		0799E6212B94ECCD00719015 /* EssentialFeediOS.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = EssentialFeediOS.xctestplan; sourceTree = "<group>"; };
 		07B589C92BD54CCC00B4C123 /* ImageCommentsMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCommentsMapper.swift; sourceTree = "<group>"; };
 		07B589CB2BD54D1100B4C123 /* RemoteImageCommentsLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteImageCommentsLoader.swift; sourceTree = "<group>"; };
-		07B589CD2BD54D5000B4C123 /* LoadImageCommentsFromRemoteUseCaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadImageCommentsFromRemoteUseCaseTests.swift; sourceTree = "<group>"; };
 		07B589D02BD5517E00B4C123 /* ImageComment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageComment.swift; sourceTree = "<group>"; };
 		07B589D62BD554C900B4C123 /* URLProtocolStub.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLProtocolStub.swift; sourceTree = "<group>"; };
 		07B589DA2BD5552500B4C123 /* HTTPClientSpy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClientSpy.swift; sourceTree = "<group>"; };
 		07B589DD2BD5568B00B4C123 /* RemoteLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoader.swift; sourceTree = "<group>"; };
 		07B589DF2BD5571900B4C123 /* RemoteLoaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteLoaderTests.swift; sourceTree = "<group>"; };
 		07B589E02BD55C4C00B4C123 /* FeedItemsMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedItemsMapperTests.swift; sourceTree = "<group>"; };
+		07B589E22BD55D1A00B4C123 /* ImageCommentsMapperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCommentsMapperTests.swift; sourceTree = "<group>"; };
 		07C8B96B2AA3845000DCB5FF /* CacheFeedUseCaseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheFeedUseCaseTests.swift; sourceTree = "<group>"; };
 		A90B3ABC2BA0EA2C0071F78D /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
 		A92382542B9371DB008A0808 /* CoreDataFeedStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataFeedStoreTests.swift; sourceTree = "<group>"; };
@@ -372,7 +372,7 @@
 		07B589DC2BD5559D00B4C123 /* ImageCommentsAPI */ = {
 			isa = PBXGroup;
 			children = (
-				07B589CD2BD54D5000B4C123 /* LoadImageCommentsFromRemoteUseCaseTests.swift */,
+				07B589E22BD55D1A00B4C123 /* ImageCommentsMapperTests.swift */,
 			);
 			path = ImageCommentsAPI;
 			sourceTree = "<group>";
@@ -930,7 +930,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				A92382552B9371DB008A0808 /* CoreDataFeedStoreTests.swift in Sources */,
-				07B589CE2BD54D5000B4C123 /* LoadImageCommentsFromRemoteUseCaseTests.swift in Sources */,
 				A9E19BB42AB746D70086253B /* FeedCacheTestHelpers.swift in Sources */,
 				A9E19BB22AB7415A0086253B /* ValidateFeedCacheUseCaseTests.swift in Sources */,
 				A959DBE92B9FC42C001C30AA /* FeedPresenterTests.swift in Sources */,
@@ -939,6 +938,7 @@
 				074540F02A9A5159001F4A43 /* XCTestCase+MemoryLeakTrackingHelper.swift in Sources */,
 				A9E69C292AAC7BE3001074C8 /* FeedStoreSpy.swift in Sources */,
 				A9E19BB62AB747AA0086253B /* SharedTestHelpers.swift in Sources */,
+				07B589E32BD55D1A00B4C123 /* ImageCommentsMapperTests.swift in Sources */,
 				07B589E12BD55C4C00B4C123 /* FeedItemsMapperTests.swift in Sources */,
 				07C8B96C2AA3845000DCB5FF /* CacheFeedUseCaseTests.swift in Sources */,
 				078279832BA4DD15007DAAF9 /* RemoteFeedImageLoaderTests.swift in Sources */,
