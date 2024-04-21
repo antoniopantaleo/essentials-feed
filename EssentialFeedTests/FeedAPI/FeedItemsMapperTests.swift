@@ -55,12 +55,6 @@ class FeedItemsMapperTests: XCTestCase {
         XCTAssertEqual(result, [item1.model, item2.model])
     }
 
-    // MARK: - Helpers
-
-    private func failure(_ error: RemoteFeedLoader.Error) -> RemoteFeedLoader.Result {
-        return .failure(error)
-    }
-
 }
 
 private extension HTTPURLResponse {
