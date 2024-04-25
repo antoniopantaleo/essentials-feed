@@ -327,13 +327,13 @@ final class FeedViewControllerTests: XCTestCase {
         XCTAssertEqual(sut.errorMessage, nil)
         
         loader.completeFeedLoadingWithError()
-        XCTAssertEqual(sut.errorMessage, localized(bundle: bundle, "FEED_VIEW_CONNECTION_ERROR"))
+        XCTAssertEqual(sut.errorMessage, localized(bundle: bundle, "GENERIC_CONNECTION_ERROR"))
         
         sut.simulateUserInitiatedFeedReload()
         XCTAssertEqual(sut.errorMessage, nil)
         
         loader.completeFeedLoadingWithError(at: 1)
-        XCTAssertEqual(sut.errorMessage, localized(bundle: bundle, "FEED_VIEW_CONNECTION_ERROR"))
+        XCTAssertEqual(sut.errorMessage, localized(bundle: bundle, "GENERIC_CONNECTION_ERROR"))
         XCTAssertNoThrow(try sut.simulateTapOnErrorView())
         XCTAssertEqual(sut.errorMessage, nil)
     }

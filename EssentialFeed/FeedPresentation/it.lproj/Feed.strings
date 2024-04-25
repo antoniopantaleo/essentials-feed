@@ -1,2 +1,2 @@
 "FEED_VIEW_TITLE" = "Il mio Feed";
-"FEED_VIEW_CONNECTION_ERROR" = "Impossibile connettersi al server";
+"GENERIC_CONNECTION_ERROR" = "Impossibile connettersi al server";
