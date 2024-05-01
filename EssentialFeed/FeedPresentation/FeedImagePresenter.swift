@@ -53,7 +53,8 @@ public final class FeedImagePresenter<View: FeedImageView, Image> where View.Ima
             location: model.location,
             image: image,
             isLoading: false,
-            shouldRetry: false))
+            shouldRetry: false)
+        )
     }
     
     public func didFinishLoadingImageData(with error: Error, for model: FeedImage) {
@@ -63,5 +64,14 @@ public final class FeedImagePresenter<View: FeedImageView, Image> where View.Ima
             image: nil,
             isLoading: false,
             shouldRetry: true))
+    }
+    
+    public static func map(_ image: FeedImage) -> FeedImageViewModel<Image> {
+        FeedImageViewModel(
+            description: image.description,
+            location: image.location,
+            image: nil,
+            isLoading: false,
+            shouldRetry: false)
     }
 }
