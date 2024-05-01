@@ -61,8 +61,8 @@ extension WeakRefProxy: ResourceLoadingView where T: ResourceLoadingView {
     }
 }
 
-extension WeakRefProxy: FeedImageView where T: FeedImageView, T.Image == UIImage {
-    func display(_ viewModel: FeedImageViewModel<UIImage>) {
+extension WeakRefProxy: ResourceView where T: ResourceView, T.ResourceViewModel == UIImage {
+    func display(_ viewModel: UIImage) {
         instance?.display(viewModel)
     }
 }
@@ -85,19 +85,30 @@ private final class FeedViewAdapter: ResourceView {
     
     func display(_ viewModel: FeedViewModel) {
         controller?.tableModel = viewModel.feed.map { model in
-            let adapter = FeedImageLoaderPresentationAdapter<WeakRefProxy<FeedImageCellController>, UIImage>(
-                model: model,
-                imageLoader: imageLoader
+            let adapter = LoadResourcePresentationAdapter<Data, WeakRefProxy<FeedImageCellController>> { [imageLoader] in
+                imageLoader(model.url)
+            }
+            let view = FeedImageCellController(
+                viewModel: FeedImagePresenter<FeedImageCellController, UIImage>.map(model),
+                delegate: adapter
             )
-            let view = FeedImageCellController(delegate: adapter)
-            adapter.presenter = FeedImagePresenter(
-                view: WeakRefProxy(view),
-                imageTransformer: UIImage.init(data:)
+            
+            adapter.presenter = LoadResourcePresenter(
+                resourceView: WeakRefProxy(view),
+                loadingView: WeakRefProxy(view),
+                errorView: WeakRefProxy(view),
+                mapper: { data in
+                    guard let image = UIImage(data: data) else {
+                        throw InvalidImageDataError()
+                    }
+                    return image
+                }
             )
             return view
         }
     }
 }
+private struct InvalidImageDataError: Error {}
 
 private final class LoadResourcePresentationAdapter<Resource, View: ResourceView> {
     private let loader: () -> AnyPublisher<Resource, Error>
@@ -120,6 +131,17 @@ private final class LoadResourcePresentationAdapter<Resource, View: ResourceView
                 presenter?.didFinishLoading(with: resource)
             }
         )
+    }
+}
+
+extension LoadResourcePresentationAdapter: FeedImageCellControllerDelegate {
+    func didRequestImage() {
+        loadResource()
+    }
+    
+    func didCancelImageRequest() {
+        cancellable?.cancel()
+        cancellable = nil
     }
 }
 
