@@ -59,7 +59,6 @@ class LoadResourcePresenterTests: XCTestCase {
         let view = ViewSpy()
         let sut = SUT(
             resourceView: view,
-            feedView: view,
             loadingView: view,
             errorView: view,
             mapper: mapper

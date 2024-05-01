@@ -22,13 +22,14 @@ public enum FeedUIComposer {
             loadFeed: feedLoaderPresentationAdapter.loadFeed,
             title: FeedPresenter.title
         )
-        feedLoaderPresentationAdapter.feedPresenter = FeedPresenter(
-            feedView: FeedImageCellControllerAdapter(
+        feedLoaderPresentationAdapter.presenter = LoadResourcePresenter(
+            resourceView: FeedViewAdapter(
                 controller: feedViewController,
                 imageLoader: { imageLoader($0).dispatchOnMainQueue() }
             ),
             loadingView: WeakRefProxy(feedViewController),
-            errorView: WeakRefProxy(feedViewController)
+            errorView: WeakRefProxy(feedViewController),
+            mapper: FeedPresenter.map
         )
         return feedViewController
     }
@@ -72,7 +73,7 @@ extension WeakRefProxy: ResourceErrorView where T: ResourceErrorView {
     }
 }
 
-private final class FeedImageCellControllerAdapter: FeedView {
+private final class FeedViewAdapter: ResourceView {
     
     private weak var controller: FeedViewController?
     private let imageLoader: (URL) -> FeedImageLoader.Publisher
@@ -100,7 +101,7 @@ private final class FeedImageCellControllerAdapter: FeedView {
 
 private final class FeedLoaderPresentationAdapter {
     private let feedLoader: () -> AnyPublisher<[FeedImage], Error>
-    var feedPresenter: FeedPresenter?
+    var presenter: LoadResourcePresenter<[FeedImage], FeedViewAdapter>?
     private var cancellable: AnyCancellable?
     
     init(feedLoader: @escaping () -> AnyPublisher<[FeedImage], Error>) {
@@ -108,15 +109,15 @@ private final class FeedLoaderPresentationAdapter {
     }
     
     func loadFeed() {
-        feedPresenter?.didStartLoadingFeed()
+        presenter?.didStartLoading()
         cancellable = feedLoader().sink(
-            receiveCompletion: { [weak feedPresenter] completion in
+            receiveCompletion: { [weak presenter] completion in
                 if case let .failure(error) = completion {
-                    feedPresenter?.didFinishLoadingFeed(with: error)
+                    presenter?.didFinishLoading(with: error)
                 }
             },
-            receiveValue: { [weak feedPresenter] feed in
-                feedPresenter?.didFinishLoadingFeed(with: feed)
+            receiveValue: { [weak presenter] feed in
+                presenter?.didFinishLoading(with: feed)
             }
         )
     }
