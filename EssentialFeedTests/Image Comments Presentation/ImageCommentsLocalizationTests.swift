@@ -1,5 +1,5 @@
 //
-//  SharedLocalizationTests.swift
+//  ImageCommentsLocalizationTests.swift
 //  EssentialFeedTests
 //
 //  Created by Antonio on 01/05/24.
@@ -8,11 +8,11 @@
 import XCTest
 import EssentialFeed
 
-class SharedLocalizationTests: XCTestCase {
+final class ImageCommentsLocalizationTests: XCTestCase {
     
     func test_localizedStrings_haveKeysAndValuesForAllSupportedLocalizations() {
-        let table = "Shared"
-        let presentationBundle = Bundle(for: LoadResourcePresenter<Any, DummyView>.self)
+        let table = "ImageComments"
+        let presentationBundle = Bundle(for: ImageCommentsPresenter.self)
         let localizationBundles = allLocalizationBundles(in: presentationBundle)
         let localizedStringKeys = allLocalizedStringKeys(in: localizationBundles, table: table)
         
@@ -27,10 +27,6 @@ class SharedLocalizationTests: XCTestCase {
                 }
             }
         }
-    }
-    
-    private class DummyView: ResourceView {
-        func display(_ viewModel: Any) {}
     }
     
 }
