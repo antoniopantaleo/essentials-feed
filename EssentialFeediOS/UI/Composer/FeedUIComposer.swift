@@ -89,7 +89,7 @@ private final class FeedViewAdapter: ResourceView {
                 imageLoader(model.url)
             }
             let view = FeedImageCellController(
-                viewModel: FeedImagePresenter<FeedImageCellController, UIImage>.map(model),
+                viewModel: FeedImagePresenter.map(model),
                 delegate: adapter
             )
             
@@ -142,37 +142,5 @@ extension LoadResourcePresentationAdapter: FeedImageCellControllerDelegate {
     func didCancelImageRequest() {
         cancellable?.cancel()
         cancellable = nil
-    }
-}
-
-private final class FeedImageLoaderPresentationAdapter<View: FeedImageView, Image>: FeedImageCellControllerDelegate where View.Image == Image {
-    private let model: FeedImage
-    private let imageLoader: (URL) -> FeedImageLoader.Publisher
-    private var cancellable: AnyCancellable?
-    
-    var presenter: FeedImagePresenter<View, Image>?
-    
-    init(model: FeedImage, imageLoader: @escaping (URL) -> FeedImageLoader.Publisher) {
-        self.model = model
-        self.imageLoader = imageLoader
-    }
-    
-    func didRequestImage() {
-        presenter?.didStartLoadingImageData(for: model)
-        let model = self.model
-        cancellable = imageLoader(model.url).sink(
-            receiveCompletion: { [weak presenter] completion in
-                if case let .failure(error) = completion {
-                    presenter?.didFinishLoadingImageData(with: error, for: model)
-                }
-            },
-            receiveValue: { [weak presenter] data in
-                presenter?.didFinishLoadingImageData(with: data, for: model)
-            }
-        )
-    }
-    
-    func didCancelImageRequest() {
-        cancellable?.cancel()
     }
 }
