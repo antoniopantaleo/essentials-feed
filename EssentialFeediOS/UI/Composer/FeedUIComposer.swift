@@ -15,11 +15,11 @@ public enum FeedUIComposer {
         feedLoader: @escaping () -> AnyPublisher<[FeedImage], Error>,
         imageLoader: @escaping (URL) -> FeedImageLoader.Publisher
     ) -> FeedViewController {
-        let feedLoaderPresentationAdapter = FeedLoaderPresentationAdapter(
-            feedLoader: { feedLoader().dispatchOnMainQueue() }
+        let feedLoaderPresentationAdapter = LoadResourcePresentationAdapter<[FeedImage], FeedViewAdapter>(
+            loader: feedLoader
         )
         let feedViewController = FeedViewController.makeWith(
-            loadFeed: feedLoaderPresentationAdapter.loadFeed,
+            loadFeed: feedLoaderPresentationAdapter.loadResource,
             title: FeedPresenter.title
         )
         feedLoaderPresentationAdapter.presenter = LoadResourcePresenter(
@@ -99,25 +99,25 @@ private final class FeedViewAdapter: ResourceView {
     }
 }
 
-private final class FeedLoaderPresentationAdapter {
-    private let feedLoader: () -> AnyPublisher<[FeedImage], Error>
-    var presenter: LoadResourcePresenter<[FeedImage], FeedViewAdapter>?
+private final class LoadResourcePresentationAdapter<Resource, View: ResourceView> {
+    private let loader: () -> AnyPublisher<Resource, Error>
+    var presenter: LoadResourcePresenter<Resource, View>?
     private var cancellable: AnyCancellable?
     
-    init(feedLoader: @escaping () -> AnyPublisher<[FeedImage], Error>) {
-        self.feedLoader = feedLoader
+    init(loader: @escaping () -> AnyPublisher<Resource, Error>) {
+        self.loader = loader
     }
     
-    func loadFeed() {
+    func loadResource() {
         presenter?.didStartLoading()
-        cancellable = feedLoader().sink(
+        cancellable = loader().sink(
             receiveCompletion: { [weak presenter] completion in
                 if case let .failure(error) = completion {
                     presenter?.didFinishLoading(with: error)
                 }
             },
-            receiveValue: { [weak presenter] feed in
-                presenter?.didFinishLoading(with: feed)
+            receiveValue: { [weak presenter] resource in
+                presenter?.didFinishLoading(with: resource)
             }
         )
     }
