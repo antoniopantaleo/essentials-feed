@@ -11,11 +11,14 @@ import Combine
 import UIKit
 
 public enum FeedUIComposer {
+    
+    private typealias FeedPresentationAdapter = LoadResourcePresentationAdapter<[FeedImage], FeedViewAdapter>
+    
     static func feedViewController(
         feedLoader: @escaping () -> AnyPublisher<[FeedImage], Error>,
         imageLoader: @escaping (URL) -> FeedImageLoader.Publisher
     ) -> FeedViewController {
-        let feedLoaderPresentationAdapter = LoadResourcePresentationAdapter<[FeedImage], FeedViewAdapter>(
+        let feedLoaderPresentationAdapter = FeedPresentationAdapter(
             loader: feedLoader
         )
         let feedViewController = FeedViewController.makeWith(
@@ -75,6 +78,8 @@ extension WeakRefProxy: ResourceErrorView where T: ResourceErrorView {
 
 private final class FeedViewAdapter: ResourceView {
     
+    private typealias ImageDataPresentationAdapter = LoadResourcePresentationAdapter<Data, WeakRefProxy<FeedImageCellController>>
+    
     private weak var controller: FeedViewController?
     private let imageLoader: (URL) -> FeedImageLoader.Publisher
     
@@ -85,7 +90,7 @@ private final class FeedViewAdapter: ResourceView {
     
     func display(_ viewModel: FeedViewModel) {
         controller?.tableModel = viewModel.feed.map { model in
-            let adapter = LoadResourcePresentationAdapter<Data, WeakRefProxy<FeedImageCellController>> { [imageLoader] in
+            let adapter = ImageDataPresentationAdapter { [imageLoader] in
                 imageLoader(model.url)
             }
             let view = FeedImageCellController(
