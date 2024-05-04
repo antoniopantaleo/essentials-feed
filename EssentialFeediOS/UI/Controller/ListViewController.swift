@@ -1,5 +1,5 @@
 //
-//  FeedViewController.swift
+//  ListViewController.swift
 //  EssentialFeediOS
 //
 //  Created by Antonio on 04/03/24.
@@ -14,12 +14,12 @@ public protocol CellController {
     func cancelLoad()
 }
 
-public final class FeedViewController: UITableViewController, UITableViewDataSourcePrefetching, ResourceLoadingView, ResourceErrorView {
+public final class ListViewController: UITableViewController, UITableViewDataSourcePrefetching, ResourceLoadingView, ResourceErrorView {
     
-    public var loadFeed: (() -> Void)?
+    public var load: (() -> Void)?
     
     @IBOutlet var errorView: ErrorView?
-    private var onViewIsAppearing: ((FeedViewController) -> Void)?
+    private var onViewIsAppearing: ((ListViewController) -> Void)?
     private var loadingControllers = [IndexPath: CellController]()
     public var tableModel: [CellController] = [] {
         didSet { tableView.reloadData() }
@@ -40,7 +40,7 @@ public final class FeedViewController: UITableViewController, UITableViewDataSou
     
     @IBAction
     private func refresh() {
-        loadFeed?()
+        load?()
     }
     
     public override func viewDidLayoutSubviews() {

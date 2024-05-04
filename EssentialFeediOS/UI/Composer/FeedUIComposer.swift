@@ -17,11 +17,11 @@ public enum FeedUIComposer {
     static func feedViewController(
         feedLoader: @escaping () -> AnyPublisher<[FeedImage], Error>,
         imageLoader: @escaping (URL) -> FeedImageLoader.Publisher
-    ) -> FeedViewController {
+    ) -> ListViewController {
         let feedLoaderPresentationAdapter = FeedPresentationAdapter(
             loader: { feedLoader().dispatchOnMainQueue() }
         )
-        let feedViewController = FeedViewController.makeWith(
+        let feedViewController = ListViewController.makeWith(
             loadFeed: feedLoaderPresentationAdapter.loadResource,
             title: FeedPresenter.title
         )
@@ -38,12 +38,12 @@ public enum FeedUIComposer {
     }
 }
 
-private extension FeedViewController {
-    static func makeWith(loadFeed: @escaping () -> Void, title: String) -> FeedViewController {
-        let bundle = Bundle(for: FeedViewController.self)
+private extension ListViewController {
+    static func makeWith(loadFeed: @escaping () -> Void, title: String) -> ListViewController {
+        let bundle = Bundle(for: ListViewController.self)
         let storyboard = UIStoryboard(name: "Feed", bundle: bundle)
-        let feedController = storyboard.instantiateInitialViewController() as! FeedViewController
-        feedController.loadFeed = loadFeed
+        let feedController = storyboard.instantiateInitialViewController() as! ListViewController
+        feedController.load = loadFeed
         feedController.title = title
         return feedController
     }
@@ -80,10 +80,10 @@ private final class FeedViewAdapter: ResourceView {
     
     private typealias ImageDataPresentationAdapter = LoadResourcePresentationAdapter<Data, WeakRefProxy<FeedImageCellController>>
     
-    private weak var controller: FeedViewController?
+    private weak var controller: ListViewController?
     private let imageLoader: (URL) -> FeedImageLoader.Publisher
     
-    init(controller: FeedViewController, imageLoader: @escaping (URL) -> FeedImageLoader.Publisher) {
+    init(controller: ListViewController, imageLoader: @escaping (URL) -> FeedImageLoader.Publisher) {
         self.controller = controller
         self.imageLoader = imageLoader
     }

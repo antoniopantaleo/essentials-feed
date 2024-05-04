@@ -340,7 +340,7 @@ final class FeedViewControllerTests: XCTestCase {
     
     // MARK: - Helpers
     
-    private func makeSUT(file: StaticString = #file, line: UInt = #line) -> (sut: FeedViewController, loader: LoaderSpy) {
+    private func makeSUT(file: StaticString = #file, line: UInt = #line) -> (sut: ListViewController, loader: LoaderSpy) {
         let loader = LoaderSpy()
         let sut = FeedUIComposer.feedViewController(
             feedLoader: loader.loadPublisher,
@@ -352,7 +352,7 @@ final class FeedViewControllerTests: XCTestCase {
     }
     
     private func assertThat(
-        _ sut: FeedViewController,
+        _ sut: ListViewController,
         hasViewConfiguredFor image: FeedImage,
         at index: Int,
         file: StaticString = #file,
@@ -373,7 +373,7 @@ final class FeedViewControllerTests: XCTestCase {
     }
     
     private func assertThat(
-        _ sut: FeedViewController,
+        _ sut: ListViewController,
         isRendering feed: [FeedImage],
         file: StaticString = #file,
         line: UInt = #line
