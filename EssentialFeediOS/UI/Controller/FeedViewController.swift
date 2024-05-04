@@ -8,14 +8,20 @@
 import UIKit
 import EssentialFeed
 
+public protocol CellController {
+    func view(in tableView: UITableView) -> UITableViewCell
+    func preload()
+    func cancelLoad()
+}
+
 public final class FeedViewController: UITableViewController, UITableViewDataSourcePrefetching, ResourceLoadingView, ResourceErrorView {
     
     public var loadFeed: (() -> Void)?
     
     @IBOutlet var errorView: ErrorView?
     private var onViewIsAppearing: ((FeedViewController) -> Void)?
-    private var loadingControllers = [IndexPath: FeedImageCellController]()
-    public var tableModel: [FeedImageCellController] = [] {
+    private var loadingControllers = [IndexPath: CellController]()
+    public var tableModel: [CellController] = [] {
         didSet { tableView.reloadData() }
     }
     
@@ -42,7 +48,7 @@ public final class FeedViewController: UITableViewController, UITableViewDataSou
         tableView.sizeTableHeaderToFit()
     }
     
-    public func display(_ cellControllers: [FeedImageCellController]) {
+    public func display(_ cellControllers: [CellController]) {
         loadingControllers = [:]
         tableModel = cellControllers
     }
@@ -63,7 +69,7 @@ public final class FeedViewController: UITableViewController, UITableViewDataSou
     }
         
     public override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        cellController(forRowAt: indexPath).createCellView(in: tableView)
+        cellController(forRowAt: indexPath).view(in: tableView)
     }
     
     public override func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -80,7 +86,7 @@ public final class FeedViewController: UITableViewController, UITableViewDataSou
         }
     }
     
-    private func cellController(forRowAt indexPath: IndexPath) -> FeedImageCellController {
+    private func cellController(forRowAt indexPath: IndexPath) -> CellController {
         let controller = tableModel[indexPath.row]
         loadingControllers[indexPath] = controller
         return controller
